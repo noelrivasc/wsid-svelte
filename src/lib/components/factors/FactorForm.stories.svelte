@@ -3,20 +3,7 @@
 	import { fn } from 'storybook/test';
 	import FactorFormAdd from './FactorFormAdd.svelte';
 	import FactorFormEdit from './FactorFormEdit.svelte';
-	import type { Factor } from '$lib/schemas';
-
-	const sampleFactor: Factor = {
-		id: '2b17d903-a844-4ee7-b950-a0ac8c7ecb70',
-		title: 'Salary',
-		description: 'Total compensation including bonus and equity.',
-		weight: 9
-	};
-
-	const minimalFactor: Factor = {
-		id: '64d91db7-9f95-4f00-9426-e479cd479f6d',
-		title: 'Tech stack',
-		weight: 3
-	};
+	import { formSampleFactor, formMinimalFactor } from '$lib/test_data';
 
 	const { Story } = defineMeta({
 		title: 'Components/Factors/FactorForm',
@@ -37,9 +24,9 @@
 </Story>
 
 <Story name="FactorFormEdit">
-	<FactorFormEdit factor={sampleFactor} onSave={fn()} onDelete={fn()} onCancel={fn()} />
+	<FactorFormEdit factor={formSampleFactor} onSave={fn()} onDelete={fn()} onCancel={fn()} />
 </Story>
 
 <Story name="FactorFormEdit: minimal">
-	<FactorFormEdit factor={minimalFactor} onSave={fn()} onDelete={fn()} onCancel={fn()} />
+	<FactorFormEdit factor={formMinimalFactor} onSave={fn()} onDelete={fn()} onCancel={fn()} />
 </Story>

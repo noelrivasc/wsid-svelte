@@ -3,18 +3,7 @@
 	import { fn } from 'storybook/test';
 	import FormDecisionMetadataAdd from './FormDecisionMetadataAdd.svelte';
 	import FormDecisionMetadataEdit from './FormDecisionMetadataEdit.svelte';
-	import type { DecisionMetadata } from '$lib/schemas';
-
-	const sampleMetadata: DecisionMetadata = {
-		title: 'Accept the new job offer',
-		description:
-			'A senior engineering role at a smaller company. Higher base salary but less equity, and a longer commute. Need to weigh growth, compensation, and lifestyle.'
-	};
-
-	const minimalMetadata: DecisionMetadata = {
-		title: 'Move to Lisbon',
-		description: ''
-	};
+	import { sampleMetadata, minimalMetadata } from '$lib/test_data';
 
 	const { Story } = defineMeta({
 		title: 'Components/Decision/FormDecisionMetadata',
