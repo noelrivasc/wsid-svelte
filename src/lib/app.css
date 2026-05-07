@@ -49,14 +49,14 @@
   --color-base3: var(--base3);
 
   /* Solarized Accent Colors */
-  --color-yellow: var(--yellow);
-  --color-orange: var(--orange);
-  --color-red: var(--red);
-  --color-magenta: var(--magenta);
-  --color-violet: var(--violet);
-  --color-blue: var(--blue);
-  --color-cyan: var(--cyan);
-  --color-green: var(--green);
+  --color-accent-yellow: var(--yellow);
+  --color-accent-orange: var(--orange);
+  --color-accent-red: var(--red);
+  --color-accent-magenta: var(--magenta);
+  --color-accent-violet: var(--violet);
+  --color-accent-blue: var(--blue);
+  --color-accent-cyan: var(--cyan);
+  --color-accent-green: var(--green);
 
   /* Contrast-based color scale (light mode) */
   --color-ground: var(--base3);
