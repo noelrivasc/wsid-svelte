@@ -1,0 +1,28 @@
+<script lang="ts">
+	import { EditOutline } from 'flowbite-svelte-icons';
+	import type { Scenario } from '$lib/schemas';
+
+	type Props = {
+		scenario: Scenario;
+		onEdit: (scenario: Scenario) => void;
+	};
+	let { scenario, onEdit }: Props = $props();
+</script>
+
+<li class="grid grid-cols-[1fr_auto] items-center gap-4 border-b border-c01 py-3 last:border-b-0">
+	<div class="min-w-0">
+		<p class="truncate text-base font-semibold text-body">{scenario.title}</p>
+		{#if scenario.description}
+			<p class="truncate text-sm text-body-subtle">{scenario.description}</p>
+		{/if}
+	</div>
+
+	<button
+		type="button"
+		onclick={() => onEdit(scenario)}
+		class="rounded-full p-2 text-body-subtle hover:bg-c01 hover:text-body focus:outline-none focus:ring-2 focus:ring-c02"
+		aria-label="Edit {scenario.title}"
+	>
+		<EditOutline class="h-5 w-5" />
+	</button>
+</li>
