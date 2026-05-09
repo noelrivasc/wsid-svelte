@@ -18,6 +18,10 @@ Thumbs.db
 !.env.example
 !.env.test
 
+# SQLite
+wsid.db
+wsid.db-*
+
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*

@@ -10,6 +10,7 @@ pnpm dev          # SvelteKit dev server
 pnpm storybook    # Storybook on :6006
 pnpm test         # Vitest (browser + node projects)
 pnpm check        # svelte-check / TS
+pnpm seed         # seed local SQLite (wsid.db) with the sample decision; idempotent
 ```
 
 ## Layout
