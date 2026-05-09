@@ -4,17 +4,18 @@
 
 	type Props = {
 		metadata: DecisionMetadata;
-		onSave: (metadata: DecisionMetadata) => void;
-		onDelete: (metadata: DecisionMetadata) => void;
 		onCancel: () => void;
+		onSuccess?: () => void;
+		mockSubmit?: (data: Record<string, FormDataEntryValue>) => void;
 	};
-	let { metadata, onSave, onDelete, onCancel }: Props = $props();
+	let { metadata, onCancel, onSuccess, mockSubmit }: Props = $props();
 </script>
 
 <FormDecisionMetadata
+	action="?/editMetadata"
 	initial={metadata}
 	submitLabel="Save"
-	onSubmit={onSave}
 	{onCancel}
-	onDelete={() => onDelete(metadata)}
+	{onSuccess}
+	{mockSubmit}
 />

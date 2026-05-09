@@ -1,20 +1,32 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
+	import { enhance } from '$app/forms';
+	import type { SubmitFunction } from '@sveltejs/kit';
 	import { Label, Input, Textarea, Button, Helper } from 'flowbite-svelte';
 	import { decisionMetadataSchema, type DecisionMetadata } from '$lib/schemas';
 
 	type Props = {
-		initial?: DecisionMetadata;
+		action: string;
 		submitLabel: string;
-		onSubmit: (metadata: DecisionMetadata) => void;
+		initial?: DecisionMetadata;
 		onCancel: () => void;
-		onDelete?: () => void;
+		onSuccess?: () => void;
+    // mockSubmit intercepts submission, cancels network call, to test actions in Storybook
+		mockSubmit?: (data: Record<string, FormDataEntryValue>) => void;
 	};
-	let { initial, submitLabel, onSubmit, onCancel, onDelete }: Props = $props();
+	let { action, submitLabel, initial, onCancel, onSuccess, mockSubmit }: Props = $props();
 
-	// `untrack` seeds state from `initial` once; later prop changes shouldn't overwrite user edits.
+  // CLIENT-SIDE VALIDATION
+  // Runs on input blur; provide quick feedback to user
+
+	// `untrack` seeds state from `initial` once; 
+  // later prop changes shouldn't overwrite user edits.
+  // values are bound to input fields
 	let title = $state(untrack(() => initial?.title ?? ''));
 	let description = $state(untrack(() => initial?.description ?? ''));
+
+	let titleTouched = $state(false);
+	let descriptionTouched = $state(false);
 
 	const candidate = $derived({
 		title: title.trim(),
@@ -34,21 +46,28 @@
 		return map;
 	});
 
-	let titleTouched = $state(false);
-	let descriptionTouched = $state(false);
-
-	function handleSubmit(event: Event) {
-		event.preventDefault();
-		if (!result.success) return;
-		onSubmit(result.data);
-	}
+  // STORYBOOK SUBMIT MOCK INTERCEPTOR
+  // Allows us to test actions in the context of Storybook
+  // but to allow the action to pass through in the app.
+	const submit: SubmitFunction = ({ formData, cancel }) => {
+		if (mockSubmit) {
+			mockSubmit(Object.fromEntries(formData));
+			cancel();
+			return;
+		}
+		return async ({ result, update }) => {
+			await update();
+			if (result.type === 'success') onSuccess?.();
+		};
+	};
 </script>
 
-<form onsubmit={handleSubmit} class="flex flex-col gap-4" novalidate>
+<form method="POST" {action} use:enhance={submit} class="flex flex-col gap-4" novalidate>
 	<Label class="space-y-2">
 		<span>Title</span>
 		<Input
 			type="text"
+			name="title"
 			bind:value={title}
 			onblur={() => (titleTouched = true)}
 			placeholder="e.g. Accept the new job offer"
@@ -63,6 +82,7 @@
 	<Label class="space-y-2">
 		<span>Description <span class="text-body-subtle">(optional)</span></span>
 		<Textarea
+			name="description"
 			bind:value={description}
 			onblur={() => (descriptionTouched = true)}
 			placeholder="What's the decision, and what's at stake?"
@@ -74,28 +94,19 @@
 		{/if}
 	</Label>
 
-	<div class="mt-2 flex items-center justify-between gap-2">
-		{#if onDelete}
-			<Button
-        type="button"
-        class="bg-red text-body-inverted hover:bg-red/90 focus:ring-c01"
-        onclick={onDelete}>Delete</Button>
-		{:else}
-			<span></span>
-		{/if}
-		<div class="flex gap-2">
-			<Button
-        type="button"
-        outline
-        class="border-c03 text-body hover:text-body/90 focus:ring-c01"
-        onclick={onCancel}>Cancel</Button>
-			<Button
-				type="submit"
-				disabled={!isValid}
-				class="bg-cta text-body-inverted hover:bg-cta/90 focus:ring-c01"
-			>
-				{submitLabel}
-			</Button>
-		</div>
+	<div class="mt-2 flex items-center justify-end gap-2">
+		<Button
+			type="button"
+			outline
+			class="border-c03 text-body hover:text-body/90 focus:ring-c01"
+			onclick={onCancel}>Cancel</Button
+		>
+		<Button
+			type="submit"
+			disabled={!isValid}
+			class="bg-cta text-body-inverted hover:bg-cta/90 focus:ring-c01"
+		>
+			{submitLabel}
+		</Button>
 	</div>
 </form>
