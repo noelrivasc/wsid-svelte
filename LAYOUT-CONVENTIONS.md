@@ -28,7 +28,7 @@ src/
 - **store/** — Everything related to the database and persistence: connection (`db.ts`), schema/migrations, and one repository file per entity (e.g. `decisionRepository.ts`, later `userRepository.ts`). The rest of the app talks to the store through named functions on those repositories (`loadX`, `createX`, `appendY`), never raw SQL. Avoid a catch-all `index.ts` — import the specific repository.
 - **engine/** — Pure functions that encode the domain rules. Deterministic: no `Date.now()`, no `Math.random()`, no IO. IDs and timestamps are passed in. Easy to test, easy to reason about.
 - **utils/config.ts** — The only place that reads `process.env` / `import.meta.env`. Everything else imports typed values from here.
-- **components/** — Presentational and small interactive components, grouped into feature subfolders (e.g. `components/factors/`, `components/scenarios/`). Co-locate stories and component tests next to the component.
+- **components/** — Presentational and small interactive components, grouped into feature subfolders (e.g. `components/factors/`, `components/scenarios/`). Co-locate stories and component tests next to the component. Component names lead with the entity, then role, then optional action: `<Entity><Role><Action?>` — e.g. `FactorForm`, `FactorFormEdit`, `FactorFormDelete`, `DecisionMetadataForm`. Leading with the entity keeps related files adjacent in directory listings and search.
 - **routes/** — Glue. A route file loads data through `store`, transforms it via `engine`, and hands it to `components`. If a route file grows logic of its own, that logic belongs in `engine` or `store`.
 
 ## Rules of thumb
