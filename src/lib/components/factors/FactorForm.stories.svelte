@@ -19,7 +19,7 @@
 	});
 </script>
 
-<Story name="FormFactorAdd">
+<Story name="FactorFormAdd">
 	<FactorFormAdd mockSubmit={fn()} onCancel={fn()} />
 </Story>
 

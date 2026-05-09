@@ -1,5 +1,5 @@
 <script lang="ts">
-	import FormDecisionMetadata from './FormDecisionMetadata.svelte';
+	import DecisionMetadataForm from './DecisionMetadataForm.svelte';
 	import type { DecisionMetadata } from '$lib/schemas';
 
 	type Props = {
@@ -11,7 +11,7 @@
 	let { metadata, onCancel, onSuccess, mockSubmit }: Props = $props();
 </script>
 
-<FormDecisionMetadata
+<DecisionMetadataForm
 	action="?/editMetadata"
 	initial={metadata}
 	submitLabel="Save"

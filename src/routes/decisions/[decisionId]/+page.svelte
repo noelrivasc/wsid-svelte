@@ -3,7 +3,7 @@
 	import { Drawer } from 'flowbite-svelte';
 	import { sineIn } from 'svelte/easing';
 	import Decision from '$lib/components/decision/Decision.svelte';
-	import FormDecisionMetadataEdit from '$lib/components/decision/FormDecisionMetadataEdit.svelte';
+	import DecisionMetadataFormEdit from '$lib/components/decision/DecisionMetadataFormEdit.svelte';
 	import FactorFormAdd from '$lib/components/factors/FactorFormAdd.svelte';
 	import FactorFormEdit from '$lib/components/factors/FactorFormEdit.svelte';
 	import FactorFormDelete from '$lib/components/factors/FactorFormDelete.svelte';
@@ -50,7 +50,7 @@
 	class="w-full max-w-md p-6"
 >
 	<h2 class="mb-4 text-xl font-semibold text-heading">Edit decision</h2>
-	<FormDecisionMetadataEdit
+	<DecisionMetadataFormEdit
 		metadata={data.decision.metadata}
 		onCancel={() => (editMetadataOpen = false)}
 		onSuccess={() => (editMetadataOpen = false)}

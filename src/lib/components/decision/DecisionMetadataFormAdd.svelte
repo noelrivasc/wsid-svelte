@@ -1,5 +1,5 @@
 <script lang="ts">
-	import FormDecisionMetadata from './FormDecisionMetadata.svelte';
+	import DecisionMetadataForm from './DecisionMetadataForm.svelte';
 
 	type Props = {
 		onCancel: () => void;
@@ -9,7 +9,7 @@
 	let { onCancel, onSuccess, mockSubmit }: Props = $props();
 </script>
 
-<FormDecisionMetadata
+<DecisionMetadataForm
 	action="?/addDecision"
 	submitLabel="Add"
 	{onCancel}
