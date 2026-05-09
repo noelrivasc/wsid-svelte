@@ -6,12 +6,11 @@ import {
   appendAction,
   createDecision,
   loadActions,
-  loadDecision,
   loadDecisionList
 } from './index';
 import { sampleActions, sampleDecisionId, sampleInitialMetadata } from '$lib/test_data/actions';
 import { sampleDecision } from '$lib/test_data/decision';
-import { emptyDecision } from '../engine/reducer';
+import { emptyDecision, hydrate } from '../engine/reducer';
 
 const ts = '2026-01-01T00:00:00Z';
 
@@ -32,13 +31,14 @@ describe('store', () => {
     await seed(db);
     const rows = await loadActions(sampleDecisionId, db);
     // createDecision appends one updateMetadata + sampleActions
-    expect(rows.length).toBe(sampleActions.length + 1);
+    expect(rows?.length).toBe(sampleActions.length + 1);
   });
 
-  it('loadDecision replays actions and returns the sample decision', async () => {
+  it('loadActions + hydrate reproduces the sample decision', async () => {
     await seed(db);
-    const d = await loadDecision(sampleDecisionId, db);
-    expect(d).toEqual(sampleDecision);
+    const actions = await loadActions(sampleDecisionId, db);
+    const decision = hydrate(actions);
+    expect(decision).toEqual(sampleDecision);
   });
 
   it('loadDecisionList reflects current title (last updateMetadata wins)', async () => {
@@ -47,14 +47,16 @@ describe('store', () => {
     expect(list).toEqual([{ id: sampleDecisionId, title: sampleDecision.metadata.title }]);
   });
 
-  it('returns null for missing decision', async () => {
-    const d = await loadDecision('00000000-0000-4000-8000-000000000099', db);
-    expect(d).toBeNull();
+  it('loadActions returns null for a missing decision', async () => {
+    const actions = await loadActions(sampleDecisionId, db);
+    const decision = hydrate(actions);
+    expect(decision).toBeNull();
   });
 
-  it('loadDecision returns an empty decision if there are no actions', async () => {
+  it('hydrate returns an empty decision when the decision exists but has no actions', async () => {
     await db.insertInto('decisions').values({ id: sampleDecisionId, title: '' }).execute();
-    const d = await loadDecision(sampleDecisionId, db);
-    expect(d).toEqual(emptyDecision);
+    const actions = await loadActions(sampleDecisionId, db);
+    const decision = hydrate(actions);
+    expect(decision).toEqual(emptyDecision);
   });
 });

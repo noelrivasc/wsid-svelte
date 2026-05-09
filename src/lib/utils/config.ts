@@ -3,5 +3,6 @@
 // relies on `node --env-file-if-exists=.env` (see package.json `seed`).
 
 export const config = {
-	databasePath: process.env.DATABASE_PATH ?? 'data/wsid.db'
+	databasePath: process.env.DATABASE_PATH ?? 'data/wsid.db',
+	appendActionMaxRetries: Number(process.env.APPEND_ACTION_MAX_RETRIES ?? 5)
 } as const;

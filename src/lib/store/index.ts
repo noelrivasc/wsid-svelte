@@ -5,8 +5,8 @@ import { type DB } from './schema';
 export { createDb, getConnection } from './db';
 export type { DB } from './schema';
 import { actionSchema, type Action } from '$lib/schemas';
-import { replay } from '../engine/reducer';
-import type { Decision, DecisionMetadata } from '$lib/schemas';
+import type { DecisionMetadata } from '$lib/schemas';
+import { config } from '$lib/utils/config';
 
 export interface DecisionListItem {
   id: string;
@@ -18,30 +18,28 @@ export async function loadDecisionList(db?: Kysely<DB>): Promise<DecisionListIte
   return c.selectFrom('decisions').select(['id', 'title']).orderBy('title').execute();
 }
 
-export async function loadActions(decisionId: string, db?: Kysely<DB>): Promise<Action[]> {
+// Returns null if the decision does not exist, [] if it exists with no actions.
+export async function loadActions(
+  decisionId: string,
+  db?: Kysely<DB>
+): Promise<Action[] | null> {
   const c = db ?? (await getConnection());
   const rows = await c
-    .selectFrom('actions')
-    .select(['type', 'version', 'payload'])
-    .where('decision_id', '=', decisionId)
-    .orderBy('seq')
+    .selectFrom('decisions as d')
+    .leftJoin('actions as a', 'a.decision_id', 'd.id')
+    .select(['a.type', 'a.version', 'a.payload', 'a.seq'])
+    .where('d.id', '=', decisionId)
+    .orderBy('a.seq')
     .execute();
+  if (rows.length === 0) return null;
+  if (rows.length === 1 && rows[0].type === null) return [];
   return rows.map((r) =>
-    actionSchema.parse({ type: r.type, version: r.version, payload: JSON.parse(r.payload) })
+    actionSchema.parse({
+      type: r.type,
+      version: r.version,
+      payload: JSON.parse(r.payload as string)
+    })
   );
-}
-
-// TODO: keep loadDecision Actions in store; keep replay in engine
-// (avoid circular dep between store and engine)
-export async function loadDecision(decisionId: string, db?: Kysely<DB>): Promise<Decision | null> {
-  const c = db ?? (await getConnection());
-  const meta = await c
-    .selectFrom('decisions')
-    .select('id')
-    .where('id', '=', decisionId)
-    .executeTakeFirst();
-  if (!meta) return null;
-  return replay(await loadActions(decisionId, c));
 }
 
 // Create the canvas: insert the decisions row and append the first updateMetadata
@@ -83,8 +81,7 @@ export async function appendAction(
   actionSchema.parse(action);
   const c = db ?? (await getConnection());
 
-  // TODO: move to configuration
-  const maxRetries = 5;
+  const maxRetries = config.appendActionMaxRetries;
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
       return await c.transaction().execute(async (tx) => {
