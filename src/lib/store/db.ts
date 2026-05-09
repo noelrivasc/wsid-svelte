@@ -1,9 +1,13 @@
+import { mkdirSync } from 'node:fs';
+import { dirname } from 'node:path';
 import Database from 'better-sqlite3';
 import { Kysely, SqliteDialect } from 'kysely';
+import { config } from '$lib/utils/config';
 import { sqlSchema, type DB } from './schema';
 
 
 export function createDb(path: string): Kysely<DB> {
+  mkdirSync(dirname(path), { recursive: true });
   const sqlite = new Database(path);
   sqlite.pragma('journal_mode = WAL');
   sqlite.pragma('synchronous = NORMAL');
@@ -14,11 +18,8 @@ export function createDb(path: string): Kysely<DB> {
 
 let _db: Kysely<DB> | null = null;
 
-// SvelteKit entrypoint: reads DATABASE_PATH from $env at first call.
 export async function getConnection(): Promise<Kysely<DB>> {
   if (_db) return _db;
-  // TODO: move env to centralized config
-  const { env } = await import('$env/dynamic/private');
-  _db = createDb(env.DATABASE_PATH ?? 'wsid.db');
+  _db = createDb(config.databasePath);
   return _db;
 }

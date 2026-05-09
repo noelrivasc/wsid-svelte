@@ -19,8 +19,7 @@ Thumbs.db
 !.env.test
 
 # SQLite
-wsid.db
-wsid.db-*
+data/
 
 # Vite
 vite.config.js.timestamp-*
