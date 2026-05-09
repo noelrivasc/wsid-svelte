@@ -11,6 +11,7 @@ import {
 } from './index';
 import { sampleActions, sampleDecisionId, sampleInitialMetadata } from '$lib/test_data/actions';
 import { sampleDecision } from '$lib/test_data/decision';
+import { emptyDecision } from '../engine/reducer';
 
 const ts = '2026-01-01T00:00:00Z';
 
@@ -51,5 +52,9 @@ describe('store', () => {
     expect(d).toBeNull();
   });
 
-  // TODO: "loadDecision returns an empty decision if there are no actions"
+  it('loadDecision returns an empty decision if there are no actions', async () => {
+    await db.insertInto('decisions').values({ id: sampleDecisionId, title: '' }).execute();
+    const d = await loadDecision(sampleDecisionId, db);
+    expect(d).toEqual(emptyDecision);
+  });
 });
