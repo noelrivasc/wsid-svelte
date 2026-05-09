@@ -1,5 +1,6 @@
 import type { Actions, PageServerLoad } from './$types';
-import { loadDecision, appendAction } from '$lib/store';
+import { loadActions, appendAction } from '$lib/store';
+import { hydrate } from '$lib/engine/reducer';
 import {
   decisionMetadataSchema,
   factorSchema,
@@ -9,8 +10,8 @@ import { error, fail } from '@sveltejs/kit';
 import { z } from 'zod';
 
 export const load: PageServerLoad = async ({ params }) => {
-  const decision = await loadDecision(params.decisionId);
-  if (!decision) throw error(404, 'Decision not found');
+  const decision = hydrate(await loadActions(params.decisionId));
+  if (decision === null) throw error(404, 'Decision not found');
   return { decisionId: params.decisionId, decision };
 };
 
