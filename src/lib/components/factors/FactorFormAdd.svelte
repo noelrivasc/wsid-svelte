@@ -1,12 +1,18 @@
 <script lang="ts">
 	import FactorForm from './FactorForm.svelte';
-	import type { Factor } from '$lib/schemas';
 
 	type Props = {
-		onAdd: (factor: Factor) => void;
 		onCancel: () => void;
+		onSuccess?: () => void;
+		mockSubmit?: (data: Record<string, FormDataEntryValue>) => void;
 	};
-	let { onAdd, onCancel }: Props = $props();
+	let { onCancel, onSuccess, mockSubmit }: Props = $props();
 </script>
 
-<FactorForm submitLabel="Add" onSubmit={onAdd} {onCancel} />
+<FactorForm
+	action="?/addFactor"
+	submitLabel="Add"
+	{onCancel}
+	{onSuccess}
+	{mockSubmit}
+/>

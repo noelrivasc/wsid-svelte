@@ -12,7 +12,7 @@
 			docs: {
 				description: {
 					component:
-						'Form for creating or editing a factor. Always consume via the `FactorFormAdd` or `FactorFormEdit` wrappers — they expose mode-specific prop shapes and keep call sites unambiguous. The underlying `FactorForm` is an implementation detail and should not be imported directly.'
+						'Form for creating or editing a factor. Always consume via the `FactorFormAdd` or `FactorFormEdit` wrappers — they expose mode-specific prop shapes and keep call sites unambiguous. The underlying `FactorForm` is an implementation detail and should not be imported directly. In Storybook, pass `mockSubmit` (and `mockDelete` on Edit) to intercept submission.'
 				}
 			}
 		}
@@ -20,13 +20,23 @@
 </script>
 
 <Story name="FormFactorAdd">
-	<FactorFormAdd onAdd={fn()} onCancel={fn()} />
+	<FactorFormAdd mockSubmit={fn()} onCancel={fn()} />
 </Story>
 
 <Story name="FactorFormEdit">
-	<FactorFormEdit factor={formSampleFactor} onSave={fn()} onDelete={fn()} onCancel={fn()} />
+	<FactorFormEdit
+		factor={formSampleFactor}
+		mockSubmit={fn()}
+		mockDelete={fn()}
+		onCancel={fn()}
+	/>
 </Story>
 
 <Story name="FactorFormEdit: minimal">
-	<FactorFormEdit factor={formMinimalFactor} onSave={fn()} onDelete={fn()} onCancel={fn()} />
+	<FactorFormEdit
+		factor={formMinimalFactor}
+		mockSubmit={fn()}
+		mockDelete={fn()}
+		onCancel={fn()}
+	/>
 </Story>
