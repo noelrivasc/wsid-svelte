@@ -11,13 +11,20 @@
 		args: {
 			factors: sampleFactors,
 			onAdd: fn(),
-			onEdit: fn()
+			onEdit: fn(),
+			onDelete: fn()
 		}
 	});
 </script>
 
 <Story name="Default" />
 
-<Story name="Empty" args={{ factors: [], onAdd: fn(), onEdit: fn() }} />
+<Story
+	name="Empty"
+	args={{ factors: [], onAdd: fn(), onEdit: fn(), onDelete: fn() }}
+/>
 
-<Story name="SingleFactor" args={{ factors: [singleFactor], onAdd: fn(), onEdit: fn() }} />
+<Story
+	name="SingleFactor"
+	args={{ factors: [singleFactor], onAdd: fn(), onEdit: fn(), onDelete: fn() }}
+/>

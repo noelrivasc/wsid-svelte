@@ -13,6 +13,7 @@
 			onEditMetadata: fn(),
 			onAddFactor: fn(),
 			onEditFactor: fn(),
+			onDeleteFactor: fn(),
 			onAddScenario: fn(),
 			onEditScenario: fn()
 		}

@@ -7,8 +7,9 @@
 		factors: Factors;
 		onAdd: () => void;
 		onEdit: (factor: Factor) => void;
+		onDelete: (factor: Factor) => void;
 	};
-	let { factors, onAdd, onEdit }: Props = $props();
+	let { factors, onAdd, onEdit, onDelete }: Props = $props();
 </script>
 
 <section>
@@ -35,7 +36,7 @@
 	{:else}
 		<ul class="mt-4">
 			{#each factors as factor (factor.id ?? factor.title)}
-				<FactorRow {factor} {onEdit} />
+				<FactorRow {factor} {onEdit} {onDelete} />
 			{/each}
 		</ul>
 	{/if}

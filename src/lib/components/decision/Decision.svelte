@@ -13,6 +13,7 @@
 		onEditMetadata: () => void;
 		onAddFactor: () => void;
 		onEditFactor: (factor: Factor) => void;
+		onDeleteFactor: (factor: Factor) => void;
 		onAddScenario: () => void;
 		onEditScenario: (scenario: Scenario) => void;
 	};
@@ -21,6 +22,7 @@
 		onEditMetadata,
 		onAddFactor,
 		onEditFactor,
+		onDeleteFactor,
 		onAddScenario,
 		onEditScenario
 	}: Props = $props();
@@ -48,7 +50,12 @@
 	</Label>
 
 	{#if showFactors}
-		<FactorsList factors={decision.factors} onAdd={onAddFactor} onEdit={onEditFactor} />
+		<FactorsList
+			factors={decision.factors}
+			onAdd={onAddFactor}
+			onEdit={onEditFactor}
+			onDelete={onDeleteFactor}
+		/>
 	{/if}
 
 	{#if showScenarios}

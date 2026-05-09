@@ -36,16 +36,4 @@
 		{onSuccess}
 		{mockSubmit}
 	/>
-
-	<form
-		method="POST"
-		action="?/deleteFactor"
-		use:enhance={deleteSubmit}
-		class="border-t border-c03 pt-4"
-	>
-		<input type="hidden" name="id" value={factor.id} />
-		<Button type="submit" class="bg-red text-body-inverted hover:bg-red/90 focus:ring-c01">
-			Delete
-		</Button>
-	</form>
 </div>
