@@ -7,7 +7,7 @@ import {
   createDecision,
   loadActions,
   loadDecisionList
-} from './index';
+} from './decisionRepository';
 import { sampleActions, sampleDecisionId, sampleInitialMetadata } from '$lib/test_data/actions';
 import { sampleDecision } from '$lib/test_data/decision';
 import { emptyDecision, hydrate } from '../engine/reducer';

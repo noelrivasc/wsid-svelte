@@ -1,5 +1,5 @@
 import type { Actions, PageServerLoad } from './$types';
-import { loadActions, appendAction } from '$lib/store';
+import { loadActions, appendAction } from '$lib/store/decisionRepository';
 import { hydrate } from '$lib/engine/reducer';
 import {
   decisionMetadataSchema,
