@@ -1,15 +1,16 @@
 <script lang="ts">
-	import { EditOutline } from 'flowbite-svelte-icons';
+	import { EditOutline, TrashBinOutline } from 'flowbite-svelte-icons';
 	import type { Scenario } from '$lib/schemas';
 
 	type Props = {
 		scenario: Scenario;
 		onEdit: (scenario: Scenario) => void;
+		onDelete: (scenario: Scenario) => void;
 	};
-	let { scenario, onEdit }: Props = $props();
+	let { scenario, onEdit, onDelete }: Props = $props();
 </script>
 
-<li class="grid grid-cols-[1fr_auto] items-center gap-4 border-b border-c01 py-3 last:border-b-0">
+<li class="grid grid-cols-[1fr_auto_auto] items-center gap-2 border-b border-c01 py-3 last:border-b-0">
 	<div class="min-w-0">
 		<p class="truncate text-base font-semibold text-body">{scenario.title}</p>
 		{#if scenario.description}
@@ -24,5 +25,14 @@
 		aria-label="Edit {scenario.title}"
 	>
 		<EditOutline class="h-5 w-5" />
+	</button>
+
+	<button
+		type="button"
+		onclick={() => onDelete(scenario)}
+		class="rounded-full p-2 text-body-subtle hover:bg-c01 hover:text-red focus:outline-none focus:ring-2 focus:ring-c02"
+		aria-label="Delete {scenario.title}"
+	>
+		<TrashBinOutline class="h-5 w-5" />
 	</button>
 </li>

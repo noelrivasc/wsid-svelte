@@ -7,8 +7,9 @@
 		scenarios: ScenariosList;
 		onAdd: () => void;
 		onEdit: (scenario: Scenario) => void;
+		onDelete: (scenario: Scenario) => void;
 	};
-	let { scenarios, onAdd, onEdit }: Props = $props();
+	let { scenarios, onAdd, onEdit, onDelete }: Props = $props();
 </script>
 
 <section>
@@ -35,7 +36,7 @@
 	{:else}
 		<ul class="mt-4">
 			{#each scenarios as scenario (scenario.id ?? scenario.title)}
-				<ScenarioRow {scenario} {onEdit} />
+				<ScenarioRow {scenario} {onEdit} {onDelete} />
 			{/each}
 		</ul>
 	{/if}

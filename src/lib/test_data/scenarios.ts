@@ -24,3 +24,14 @@ export const indieScenario: Scenario = {
 };
 
 export const sampleScenarios: ScenariosList = [stayScenario, newJobScenario, indieScenario];
+
+export const formSampleScenario: Scenario = {
+	id: 'b1f3d8b2-3e0c-4d2f-9a4f-1c2e7b9d4a01',
+	title: 'Take the new offer',
+	description: 'Higher salary, new domain, longer commute, less equity.'
+};
+
+export const formMinimalScenario: Scenario = {
+	id: 'd4a2c1f6-7e9b-4c3a-8a1d-9f5e2b6c7d02',
+	title: 'Go independent'
+};

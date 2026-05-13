@@ -11,11 +11,12 @@
 		args: {
 			scenarios: sampleScenarios,
 			onAdd: fn(),
-			onEdit: fn()
+			onEdit: fn(),
+			onDelete: fn()
 		}
 	});
 </script>
 
 <Story name="Default" />
 
-<Story name="Empty" args={{ scenarios: [], onAdd: fn(), onEdit: fn() }} />
+<Story name="Empty" args={{ scenarios: [], onAdd: fn(), onEdit: fn(), onDelete: fn() }} />

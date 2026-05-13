@@ -15,7 +15,8 @@
 			onEditFactor: fn(),
 			onDeleteFactor: fn(),
 			onAddScenario: fn(),
-			onEditScenario: fn()
+			onEditScenario: fn(),
+			onDeleteScenario: fn()
 		}
 	});
 </script>

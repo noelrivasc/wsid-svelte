@@ -16,6 +16,7 @@
 		onDeleteFactor: (factor: Factor) => void;
 		onAddScenario: () => void;
 		onEditScenario: (scenario: Scenario) => void;
+		onDeleteScenario: (scenario: Scenario) => void;
 	};
 	let {
 		decision,
@@ -24,7 +25,8 @@
 		onEditFactor,
 		onDeleteFactor,
 		onAddScenario,
-		onEditScenario
+		onEditScenario,
+		onDeleteScenario
 	}: Props = $props();
 
 	let viewMode = $state<ViewMode>('full');
@@ -59,7 +61,12 @@
 	{/if}
 
 	{#if showScenarios}
-		<ScenariosList scenarios={decision.scenarios} onAdd={onAddScenario} onEdit={onEditScenario} />
+		<ScenariosList
+			scenarios={decision.scenarios}
+			onAdd={onAddScenario}
+			onEdit={onEditScenario}
+			onDelete={onDeleteScenario}
+		/>
 	{/if}
 
 	{#if showGrid}
