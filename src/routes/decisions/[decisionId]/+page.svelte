@@ -7,7 +7,10 @@
 	import FactorFormAdd from '$lib/components/factors/FactorFormAdd.svelte';
 	import FactorFormEdit from '$lib/components/factors/FactorFormEdit.svelte';
 	import FactorFormDelete from '$lib/components/factors/FactorFormDelete.svelte';
-	import type { Factor } from '$lib/schemas';
+	import ScenarioFormAdd from '$lib/components/scenarios/ScenarioFormAdd.svelte';
+	import ScenarioFormEdit from '$lib/components/scenarios/ScenarioFormEdit.svelte';
+	import ScenarioFormDelete from '$lib/components/scenarios/ScenarioFormDelete.svelte';
+	import type { Factor, Scenario } from '$lib/schemas';
 
 	let { data }: PageProps = $props();
 
@@ -18,7 +21,11 @@
 	let factorBeingEdited = $state<Factor | null>(null);
 	let factorBeingDeleted = $state<Factor | null>(null);
 
-	const noop = () => {};
+	let addScenarioOpen = $state(false);
+	let editScenarioOpen = $state(false);
+	let deleteScenarioOpen = $state(false);
+	let scenarioBeingEdited = $state<Scenario | null>(null);
+	let scenarioBeingDeleted = $state<Scenario | null>(null);
 
 	const transitionParams = { x: 320, duration: 200, easing: sineIn };
 
@@ -31,6 +38,16 @@
 		factorBeingDeleted = factor;
 		deleteFactorOpen = true;
 	}
+
+	function openEditScenario(scenario: Scenario) {
+		scenarioBeingEdited = scenario;
+		editScenarioOpen = true;
+	}
+
+	function openDeleteScenario(scenario: Scenario) {
+		scenarioBeingDeleted = scenario;
+		deleteScenarioOpen = true;
+	}
 </script>
 
 <Decision
@@ -39,8 +56,9 @@
 	onAddFactor={() => (addFactorOpen = true)}
 	onEditFactor={openEditFactor}
 	onDeleteFactor={openDeleteFactor}
-	onAddScenario={noop}
-	onEditScenario={noop}
+	onAddScenario={() => (addScenarioOpen = true)}
+	onEditScenario={openEditScenario}
+	onDeleteScenario={openDeleteScenario}
 />
 
 <Drawer
@@ -98,6 +116,51 @@
 			factor={factorBeingDeleted}
 			onCancel={() => (deleteFactorOpen = false)}
 			onSuccess={() => (deleteFactorOpen = false)}
+		/>
+	{/if}
+</Drawer>
+
+<Drawer
+	bind:open={addScenarioOpen}
+	placement="right"
+	{transitionParams}
+	class="w-full max-w-md p-6"
+>
+	<h2 class="mb-4 text-xl font-semibold text-heading">Add scenario</h2>
+	<ScenarioFormAdd
+		onCancel={() => (addScenarioOpen = false)}
+		onSuccess={() => (addScenarioOpen = false)}
+	/>
+</Drawer>
+
+<Drawer
+	bind:open={editScenarioOpen}
+	placement="right"
+	{transitionParams}
+	class="w-full max-w-md p-6"
+>
+	<h2 class="mb-4 text-xl font-semibold text-heading">Edit scenario</h2>
+	{#if scenarioBeingEdited}
+		<ScenarioFormEdit
+			scenario={scenarioBeingEdited}
+			onCancel={() => (editScenarioOpen = false)}
+			onSuccess={() => (editScenarioOpen = false)}
+		/>
+	{/if}
+</Drawer>
+
+<Drawer
+	bind:open={deleteScenarioOpen}
+	placement="right"
+	{transitionParams}
+	class="w-full max-w-md p-6"
+>
+	<h2 class="mb-4 text-xl font-semibold text-heading">Delete scenario</h2>
+	{#if scenarioBeingDeleted}
+		<ScenarioFormDelete
+			scenario={scenarioBeingDeleted}
+			onCancel={() => (deleteScenarioOpen = false)}
+			onSuccess={() => (deleteScenarioOpen = false)}
 		/>
 	{/if}
 </Drawer>
