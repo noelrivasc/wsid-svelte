@@ -2,7 +2,7 @@ import type { Kysely } from 'kysely';
 import { getConnection } from './db';
 import { type DB } from './schema';
 
-export { createDb, getConnection } from './db';
+export { getConnection } from './db';
 export type { DB } from './schema';
 import { actionSchema, type Action } from '$lib/schemas';
 import type { DecisionMetadata } from '$lib/schemas';
