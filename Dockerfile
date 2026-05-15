@@ -22,7 +22,7 @@ RUN apk add --no-cache python3 make g++ \
     && apk del python3 make g++
 
 FROM node:22-alpine AS runtime
-RUN apk add --no-cache libstdc++
+RUN apk add --no-cache libstdc++ sqlite
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
