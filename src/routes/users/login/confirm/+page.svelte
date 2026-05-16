@@ -1,13 +1,10 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+	import UserConfirmLogin from '$lib/components/user/UserConfirmLogin.svelte';
 
 	let { data }: { data: PageData } = $props();
 </script>
 
 <h1>Confirm login</h1>
 
-<form method="POST">
-	<input type="hidden" name="token" value={data.token} />
-	<p>Click below to complete your login.</p>
-	<button type="submit">Log in</button>
-</form>
+<UserConfirmLogin token={data.token} />

@@ -1,14 +1,14 @@
 <script lang="ts">
 	import type { ActionData } from './$types';
-	import UserEmailFormLogin from '$lib/components/user/UserEmailFormLogin.svelte';
+	import UserEmailFormRegister from '$lib/components/user/UserEmailFormRegister.svelte';
 
 	let { form }: { form: ActionData } = $props();
 </script>
 
-<h1>Log in</h1>
+<h1>Create your account</h1>
 
 {#if form?.message}
 	<p>{form.message}</p>
 {:else}
-	<UserEmailFormLogin />
+	<UserEmailFormRegister />
 {/if}
