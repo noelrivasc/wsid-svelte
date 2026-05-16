@@ -1,6 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { z } from 'zod';
 import { getAuth } from '$lib/auth';
+import { getUserByEmail } from '$lib/store/userRepository';
 import type { Actions, PageServerLoad } from './$types';
 
 const NEUTRAL_MESSAGE = 'If an account exists for that email, a login link has been sent.';
@@ -21,13 +22,16 @@ export const actions: Actions = {
     if (!parsed.success) {
       return fail(400, { message: NEUTRAL_MESSAGE });
     }
-    try {
-      await getAuth().api.signInMagicLink({
-        body: { email: parsed.data.email },
-        headers: request.headers
-      });
-    } catch {
-      // swallow — uniform response
+    const user = await getUserByEmail(parsed.data.email);
+    if (user) {
+      try {
+        await getAuth().api.signInMagicLink({
+          body: { email: parsed.data.email },
+          headers: request.headers
+        });
+      } catch {
+        // swallow — uniform response
+      }
     }
     return { message: NEUTRAL_MESSAGE };
   }
