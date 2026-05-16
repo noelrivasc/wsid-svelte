@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { createDb } from './db';
 import { type DB } from './schema';
+import { createFreshDb } from '$lib/utils/testHelpers';
 import type { Kysely } from 'kysely';
 import {
   appendAction,
@@ -24,7 +24,7 @@ async function seed(db: Kysely<DB>) {
 describe('store', () => {
   let db: Kysely<DB>;
   beforeEach(() => {
-    db = createDb(':memory:');
+    db = createFreshDb();
   });
 
   it('appends actions with monotonically increasing seq per decision', async () => {
