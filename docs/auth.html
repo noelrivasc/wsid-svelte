@@ -24,13 +24,39 @@
   <tr><td><code>src/routes/users/me/</code></td><td>Protected route, redirects to <code>/users/login</code> when <code>locals.user</code> is null.</td></tr>
 </table>
 
-<h2>Flow</h2>
+<h2>Flow (login &amp; register)</h2>
+<p>Both routes share the same magic-link path; they differ only at the entry step.</p>
+<div class="mermaid">
+sequenceDiagram
+  participant U as User
+  participant R as Route
+  participant A as better-auth
+  participant M as Mailer
+  participant DB as SQLite
+  alt POST /users/login
+    U->>R: email
+    R->>DB: getUserByEmail
+    Note over R: only proceed if user exists
+  else POST /users/register
+    U->>R: email
+    Note over R: always proceed (create-on-first-use)
+  end
+  R->>A: signInMagicLink
+  A->>M: sendEmail(link+token)
+  M-->>U: email with /confirm?token
+  U->>R: GET /confirm?token (form, token not consumed)
+  U->>R: POST /confirm (token)
+  R->>A: magicLinkVerify
+  A->>DB: consume token, create session
+  A-->>U: Set-Cookie session
+  R-->>U: 303 → /
+</div>
 <ol>
   <li><code>POST /users/login</code> — validate email with Zod; if the user exists, call <code>auth.api.signInMagicLink</code>. Always respond with the same neutral message.</li>
+  <li><code>POST /users/register</code> — same shape, but skips the existence check and always calls <code>signInMagicLink</code>; better-auth creates the account on first verify.</li>
   <li>The magic-link callback (in <code>$lib/auth</code>) builds a URL pointing at <code>/users/login/confirm?token=…</code> and emails it via the mailer.</li>
   <li><code>GET /users/login/confirm</code> — renders a form with the token in a hidden field. <strong>Does not consume the token.</strong> This defeats email prefetchers and corporate URL scanners.</li>
   <li><code>POST /users/login/confirm</code> — calls <code>auth.api.magicLinkVerify</code>, which consumes the token (single-use), mints a session, and sets the cookie via the <code>sveltekitCookies</code> plugin. Then redirects to <code>/</code> or a same-origin <code>redirectTo</code>.</li>
-  <li><code>POST /users/logout</code> — <code>auth.api.signOut</code> invalidates the session row.</li>
 </ol>
 
 <h2>Session</h2>
@@ -55,5 +81,10 @@ export const load = async ({ locals }) => {
 
 <h2>Schema</h2>
 <p>better-auth's tables (<code>user</code>, <code>session</code>, <code>account</code>, <code>verification</code>) live in the same SQLite file as domain tables. They're created by the initial migration. Don't reach into them from app code except via <code>userRepository.ts</code>; let better-auth own writes.</p>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  mermaid.initialize({ startOnLoad: true, theme: dark ? 'dark' : 'default' });
+</script>
 </body>
 </html>

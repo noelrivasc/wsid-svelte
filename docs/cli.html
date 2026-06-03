@@ -17,6 +17,21 @@
     <code>build/cli.mjs</code> as part of <code>pnpm build</code>. Imports <code>$lib/utils/config.runtime</code> (never
     <code>config.ts</code> — <code>$env/dynamic/private</code> isn't available outside SvelteKit).</p>
 
+  <h2>Build pipeline</h2>
+  <div class="mermaid">
+flowchart LR
+  src["src/ (TS)"]
+  vite["vite build"]
+  esbuild["esbuild"]
+  server["build/ SvelteKit server"]
+  clibundle["build/cli.mjs"]
+  image["Docker image (node:22-alpine)"]
+  entry["entrypoint.sh: migrate → server"]
+  src --> vite --> server --> image
+  src --> esbuild --> clibundle --> image
+  image --> entry
+  </div>
+
   <h2>Two ways to invoke</h2>
   <table>
     <tr>
@@ -77,6 +92,11 @@
   <p>The runtime image is plain <code>node:22-alpine</code> — no <code>tsx</code>, no <code>pnpm</code>. Bundling to a
     single <code>.mjs</code> means prod runs vanilla node, the same way SvelteKit's server does. See <a
       href="setup-docker.html">Docker setup</a> for the bigger picture.</p>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  mermaid.initialize({ startOnLoad: true, theme: dark ? 'dark' : 'default' });
+</script>
 </body>
 
 </html>

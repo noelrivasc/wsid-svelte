@@ -1,63 +1,110 @@
 <!doctype html>
 <html lang="en">
+
 <head>
-<meta charset="utf-8">
-<title>Deployment · wsid-svelte</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="utf-8">
+  <title>Deployment · wsid-svelte</title>
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-<nav class="top"><a href="index.html">← docs</a></nav>
-<h1>Deployment</h1>
-<p class="lede">Single Ubuntu VM, Docker Compose, Traefik for HTTPS, GitHub Actions for push-to-deploy. Brief downtime on each deploy is accepted.</p>
+  <nav class="top"><a href="index.html">← docs</a></nav>
+  <h1>Deployment</h1>
+  <p class="lede">Single Ubuntu VM, Docker Compose, Traefik for HTTPS, GitHub Actions for push-to-deploy. Brief downtime
+    on each deploy is accepted.</p>
 
-<h2>Host setup (one-time)</h2>
-<ol>
-  <li>Install Docker Engine (28.x, see caveat below) and the Compose plugin from Docker's official apt repo — not the distro package.</li>
-  <li>Create a non-root <code>deploy</code> user in the <code>docker</code> group.</li>
-  <li>Disable SSH password auth (<code>/etc/ssh/sshd_config.d/99-hardening.conf</code>). Keep root login key-only.</li>
-  <li><code>ufw</code>: allow 22/tcp, 80/tcp, 443/tcp; default deny incoming.</li>
-  <li>Point app DNS (and any add-on subdomains) at the VM's IP before first deploy — Let's Encrypt HTTP-01 needs it.</li>
-  <li>Create <code>/srv/wsid/</code>, owned by <code>deploy</code>. Clone the repo there.</li>
-</ol>
+  <h2>Topology</h2>
+  <div class="mermaid">
+    flowchart LR
+    user["user browser"]
+    gh["GitHub push to main"]
+    ga["Actions: deploy.yml"]
+    gh --> ga
+    ga -->|ssh| compose
+    user -->|https| traefik
+    subgraph vm["Linux VM"]
+    direction TB
+    compose["docker compose"]
+    traefik["traefik :80 :443"]
+    app["app container :3000"]
+    data[("data/wsid.db")]
+    le["letsencrypt/"]
+    compose --> traefik
+    compose --> app
+    traefik --> app
+    app --- data
+    traefik --- le
+    end
+  </div>
 
-<h2>Per-environment files</h2>
-<ul>
-  <li><code>.env</code> — secrets and per-host config. See <a href="env.html">env vars</a>.</li>
-  <li><code>./data/</code> — SQLite file lives here; bind-mounted into the app container.</li>
-  <li><code>./letsencrypt/</code> — Traefik's ACME state.</li>
-</ul>
+  <h2>Host setup (one-time)</h2>
+  <ol>
+    <li>Install Docker Engine (28.x, see caveat below) and the Compose plugin from Docker's official apt repo — not the
+      distro package.</li>
+    <li>Create a non-root <code>deploy</code> user in the <code>docker</code> group.</li>
+    <li>Disable SSH password auth (<code>/etc/ssh/sshd_config.d/99-hardening.conf</code>). Keep root login key-only.
+    </li>
+    <li><code>ufw</code>: allow 22/tcp, 80/tcp, 443/tcp; default deny incoming.</li>
+    <li>Point app DNS (and any add-on subdomains) at the VM's IP before first deploy — Let's Encrypt HTTP-01 needs it.
+    </li>
+    <li>Create <code>/srv/wsid/</code>, owned by <code>deploy</code>. Clone the repo there.</li>
+  </ol>
 
-<h2>Compose profile</h2>
-<pre><code>docker compose --profile prod up -d --build</code></pre>
-<p>Services: <code>traefik</code> (binds 80/443, mounts Docker socket read-only, Let's Encrypt resolver) and <code>app</code> (built from the repo's <code>Dockerfile</code>, Traefik-labelled for the app host). All on a single <code>web</code> network. Restart policy <code>unless-stopped</code>.</p>
+  <h2>Per-environment files</h2>
+  <ul>
+    <li><code>.env</code> — secrets and per-host config. See <a href="env.html">env vars</a>.</li>
+    <li><code>./data/</code> — SQLite file lives here; bind-mounted into the app container.</li>
+    <li><code>./letsencrypt/</code> — Traefik's ACME state.</li>
+  </ul>
 
-<h2>Boot sequence (inside the app container)</h2>
-<p><code>docker/entrypoint.sh</code> runs:</p>
-<ol>
-  <li>Snapshot the SQLite file (timestamped <code>.bak</code>).</li>
-  <li><code>node /app/build/cli.mjs migrate</code> — idempotent; only applies pending migrations.</li>
-  <li><code>exec node ./build/index.js</code> — adapter-node server on :3000.</li>
-</ol>
+  <h2>Compose profile</h2>
+  <pre><code>docker compose --profile prod up -d --build</code></pre>
+  <p>Services: <code>traefik</code> (binds 80/443, mounts Docker socket read-only, Let's Encrypt resolver) and
+    <code>app</code> (built from the repo's <code>Dockerfile</code>, Traefik-labelled for the app host). All on a single
+    <code>web</code> network. Restart policy <code>unless-stopped</code>.
+  </p>
 
-<h2>Push-to-deploy</h2>
-<p><code>.github/workflows/deploy.yml</code> SSHes into the VM on push to <code>main</code> and runs:</p>
-<pre><code>cd /srv/wsid && git reset --hard origin/main && docker compose up -d --build</code></pre>
-<p>Compose rebuilds the image, swaps the container, the entrypoint runs migrations, server boots. Downtime: a few seconds.</p>
-<p>Required GitHub secrets: <code>SSH_HOST</code>, <code>SSH_USER</code> (<code>deploy</code>), <code>SSH_KEY</code>.</p>
+  <h2>Boot sequence (inside the app container)</h2>
+  <p><code>docker/entrypoint.sh</code> runs:</p>
+  <ol>
+    <li>Snapshot the SQLite file (timestamped <code>.bak</code>).</li>
+    <li><code>node /app/build/cli.mjs migrate</code> — idempotent; only applies pending migrations.</li>
+    <li><code>exec node ./build/index.js</code> — adapter-node server on :3000.</li>
+  </ol>
 
-<h2>Manual ops against prod</h2>
-<p>SSH to the host, then:</p>
-<pre><code>cd /srv/wsid
-docker compose exec app wsid migrate:status     # or any other CLI command
-docker compose logs -f app                       # tail logs</code></pre>
+  <h2>Push-to-deploy</h2>
+  <p><code>.github/workflows/deploy.yml</code> SSHes into the VM on push to <code>main</code> and runs:</p>
+  <pre><code>cd /srv/wsid && git reset --hard origin/main && docker compose up -d --build</code></pre>
+  <p>Compose rebuilds the image, swaps the container, the entrypoint runs migrations, server boots. Downtime: a few
+    seconds.</p>
+  <p>Required GitHub secrets: <code>SSH_HOST</code>, <code>SSH_USER</code> (<code>deploy</code>), <code>SSH_KEY</code>.
+  </p>
 
-<h2>Known caveats</h2>
-<ul>
-  <li><strong>pnpm + native modules.</strong> Allowlist <code>better-sqlite3</code> in <code>pnpm-workspace.yaml</code> (<code>allowBuilds:</code>) or the install step skips native bindings and the app fails to load the module.</li>
-  <li><strong>Docker Engine 29.x.</strong> Raises the minimum API version above what Traefik's bundled Docker client (even v3.5) advertises. Pin to <code>docker-ce 28.x</code> until Traefik bumps its client.</li>
-</ul>
+  <h2>Manual ops against prod</h2>
+  <p>SSH to the host, then:</p>
+  <pre><code>cd /srv/wsid
+      docker compose exec app wsid migrate:status # or any other CLI command
+      docker compose logs -f app # tail logs</code></pre>
 
-<h2>Backups</h2>
-<p>The DB is a single file. Copy it. The entrypoint already snapshots before migrations. For off-host backups, sync <code>./data/</code> to object storage on a cron.</p>
+  <h2>Known caveats</h2>
+  <ul>
+    <li><strong>pnpm + native modules.</strong> Allowlist <code>better-sqlite3</code> in
+      <code>pnpm-workspace.yaml</code> (<code>allowBuilds:</code>) or the install step skips native bindings and the app
+      fails to load the module.
+    </li>
+    <li><strong>Docker Engine 29.x.</strong> Raises the minimum API version above what Traefik's bundled Docker client
+      (even v3.5) advertises. Pin to <code>docker-ce 28.x</code> until Traefik bumps its client.</li>
+  </ul>
+
+  <h2>Backups</h2>
+  <p>The DB is a single file. Copy it. The entrypoint already snapshots before migrations. For off-host backups, sync
+    <code>./data/</code> to object storage on a cron.
+  </p>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    mermaid.initialize({startOnLoad: true, theme: dark ? 'dark' : 'default'});
+  </script>
 </body>
+
 </html>

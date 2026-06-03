@@ -64,3 +64,5 @@ table { border-collapse: collapse; font-size: 0.92rem; margin: 0.75rem 0; }
 th, td { text-align: left; padding: 0.35rem 0.8rem 0.35rem 0; vertical-align: top; }
 th { border-bottom: 1px solid var(--rule); }
 hr { border: none; border-top: 1px solid var(--rule); margin: 2rem 0; }
+.mermaid { margin: 1.25rem 0; text-align: center; font-size: 0.85rem; }
+.mermaid svg { max-width: 100%; height: auto; }
