@@ -1,11 +1,15 @@
 import Database from 'better-sqlite3';
-import { Kysely, SqliteDialect } from 'kysely';
+import { Kysely, Migrator, SqliteDialect } from 'kysely';
 import { type DB } from '$lib/store/schema';
-import sqlSchema from '$lib/store/schema.sql?raw';
+import { bundledMigrationProvider } from '$lib/store/migrations.bundled';
 
-export function createFreshDb(): Kysely<DB> {
+export async function createFreshDb(): Promise<Kysely<DB>> {
   const sqlite = new Database(':memory:');
   sqlite.pragma('foreign_keys = ON');
-  sqlite.exec(sqlSchema);
-  return new Kysely<DB>({ dialect: new SqliteDialect({ database: sqlite }) });
+  const db = new Kysely<DB>({ dialect: new SqliteDialect({ database: sqlite }) });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const migrator = new Migrator({ db: db as Kysely<any>, provider: bundledMigrationProvider });
+  const { error } = await migrator.migrateToLatest();
+  if (error) throw error;
+  return db;
 }

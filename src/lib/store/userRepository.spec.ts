@@ -17,8 +17,8 @@ const sampleUser = {
 
 describe('userRepository', () => {
   let db: Kysely<DB>;
-  beforeEach(() => {
-    db = createFreshDb();
+  beforeEach(async () => {
+    db = await createFreshDb();
   });
 
   it('returns a User for an existing email', async () => {

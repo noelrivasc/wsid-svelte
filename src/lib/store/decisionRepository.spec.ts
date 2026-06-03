@@ -23,8 +23,8 @@ async function seed(db: Kysely<DB>) {
 
 describe('store', () => {
   let db: Kysely<DB>;
-  beforeEach(() => {
-    db = createFreshDb();
+  beforeEach(async () => {
+    db = await createFreshDb();
   });
 
   it('appends actions with monotonically increasing seq per decision', async () => {
