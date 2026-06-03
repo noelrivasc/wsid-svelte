@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Dev setup · wsid-svelte</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="top"><a href="index.html">← docs</a></nav>
+<h1>Dev setup (Vite)</h1>
+<p class="lede">Fast inner loop: SvelteKit's dev server against a host-side SQLite file. No Docker required.</p>
+
+<h2>Prerequisites</h2>
+<ul>
+  <li>Node 22+ and <code>pnpm</code> (corepack or global install).</li>
+  <li>For magic-link auth in dev, a local SMTP catcher — see <a href="setup-docker.html#mailpit">mailpit</a> below; it's the one Docker piece the bare flow benefits from.</li>
+</ul>
+
+<h2>First run</h2>
+<pre><code>pnpm install
+cp .env.example .env        # adjust if needed
+pnpm migrate                # creates data/wsid.db, applies migrations
+pnpm dev                    # http://localhost:5173</code></pre>
+
+<h2>Daily commands</h2>
+<table>
+  <tr><th>Command</th><th>What it does</th></tr>
+  <tr><td><code>pnpm dev</code></td><td>Vite dev server with HMR.</td></tr>
+  <tr><td><code>pnpm check</code></td><td>svelte-check + TypeScript across the project.</td></tr>
+  <tr><td><code>pnpm test</code></td><td>Vitest (both Node and browser projects). See <a href="testing.html">testing</a>.</td></tr>
+  <tr><td><code>pnpm lint</code> / <code>pnpm format</code></td><td>Prettier + ESLint.</td></tr>
+  <tr><td><code>pnpm storybook</code></td><td>Storybook on :6006.</td></tr>
+  <tr><td><code>pnpm docs</code></td><td>Serve these docs on :8081 (python3 http.server).</td></tr>
+  <tr><td><code>pnpm cli &lt;cmd&gt;</code></td><td>Run the admin CLI against the host DB (tsx). See <a href="cli.html">CLI</a>.</td></tr>
+  <tr><td><code>pnpm migrate</code></td><td>Shortcut for <code>pnpm cli migrate</code>.</td></tr>
+  <tr><td><code>pnpm cli seed</code></td><td>Seed sample data (idempotent).</td></tr>
+</table>
+
+<h2>Where the DB lives</h2>
+<p>The dev DB path comes from <code>DATABASE_PATH</code> (see <a href="env.html">env vars</a>), defaulting to <code>data/wsid.db</code>. It's gitignored. Delete the file to start fresh; <code>pnpm migrate</code> will rebuild it.</p>
+
+<h2>When to switch to Docker</h2>
+<p>Use the <a href="setup-docker.html">Docker setup</a> when you need to: validate native-build paths (better-sqlite3 binaries differ on alpine), test the entrypoint's migrate-on-boot behaviour, or exercise the bundled CLI (<code>cli.mjs</code>) the way prod does.</p>
+</body>
+</html>

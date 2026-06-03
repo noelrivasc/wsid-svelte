@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Code layout · wsid-svelte</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="top"><a href="index.html">← docs</a></nav>
+<h1>Code layout &amp; conventions</h1>
+<p class="lede">Each concern has a single predictable home. Routes are thin glue.</p>
+
+<h2>Tree</h2>
+<pre><code>src/
+  lib/
+    schemas/       Zod schemas + inferred types — the contract
+    test_data/     Fixtures matching the schemas (tests, stories, seeds)
+    store/         Persistence: db, schema, migrations, one repository per entity
+    engine/        Pure domain logic (no IO, no clocks, no random)
+    auth/          better-auth instance (server-only)
+    utils/         config, mailer, small helpers
+    components/    UI, grouped by feature subfolder
+    app.css        Tailwind entry + @theme tokens (shared with Storybook)
+  routes/          Thin glue: load → reduce → render
+  cli/             Admin CLI entrypoint (bundled to build/cli.mjs)
+  hooks.server.ts  Resolves session, forwards to better-auth handler</code></pre>
+
+<h2>What goes where</h2>
+<ul>
+  <li><strong>schemas/</strong> — every domain shape defined once. Imported by store, engine, components, test_data.</li>
+  <li><strong>test_data/</strong> — realistic fixtures that satisfy the schemas. Never imported by production code paths.</li>
+  <li><strong>store/</strong> — one repository file per entity (<code>decisionRepository.ts</code>, <code>userRepository.ts</code>, …). The rest of the app calls named functions (<code>loadX</code>, <code>createX</code>, <code>appendY</code>), never raw SQL. Migrations under <code>store/migrations/</code> plus a static registry in <code>store/migrations.bundled.ts</code>.</li>
+  <li><strong>engine/</strong> — pure functions. Deterministic: no <code>Date.now()</code>, no <code>Math.random()</code>, no IO. IDs and timestamps passed in. See <a href="event-sourcing.html">event sourcing</a>.</li>
+  <li><strong>utils/config.*</strong> — the only place that reads env. Everything else imports typed values. See <a href="env.html">env</a>.</li>
+  <li><strong>components/</strong> — presentational + small interactive components, grouped by feature (<code>factors/</code>, <code>user/</code>, …). Stories and component tests live next to the component. Naming: <code>&lt;Entity&gt;&lt;Role&gt;&lt;Action?&gt;</code> (e.g. <code>FactorForm</code>, <code>FactorFormEdit</code>, <code>UserEmailFormLogin</code>) — entity first keeps related files adjacent.</li>
+  <li><strong>routes/</strong> — load data through the store, transform via the engine, hand to components. Logic that grows here belongs in <code>engine/</code> or <code>store/</code>.</li>
+  <li><strong>cli/</strong> — citty subcommands. Imports from <code>$lib/utils/config.runtime</code> (not <code>config</code>) because SvelteKit's <code>$env</code> isn't available outside the server bundle.</li>
+</ul>
+
+<h2>Rules of thumb</h2>
+<ul>
+  <li>Schemas are the contract — change shapes in <code>schemas/</code> first.</li>
+  <li>The engine never imports from <code>store/</code> — keep it IO-free.</li>
+  <li>The store never imports from <code>engine/</code> — persistence stays decoupled from domain rules. (Importing schemas is fine; both layers share that contract.)</li>
+  <li>Routes never touch <code>store/db</code> directly — they go through a repository.</li>
+  <li>Config is read once, at the edge. No scattered <code>process.env</code> reads.</li>
+  <li>Test data lives in one shared place (<code>test_data/</code>, alongside <code>schemas/</code>), not scattered next to the tests that consume it.</li>
+</ul>
+
+<h2>Why this works</h2>
+<p>New code has an obvious home, so the tree stays shallow and predictable. Pure engine + thin routes means most logic is testable without a browser or a database. Swapping storage or UI framework touches one folder.</p>
+</body>
+</html>

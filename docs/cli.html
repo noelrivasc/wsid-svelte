@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>CLI · wsid-svelte</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <nav class="top"><a href="index.html">← docs</a></nav>
+  <h1>CLI</h1>
+  <p class="lede">Admin and ops commands. One source, two invocation paths — same code in dev and prod.</p>
+
+  <h2>Source</h2>
+  <p>Defined in <code>src/cli/index.ts</code> using <code>citty</code>. Bundled by esbuild into
+    <code>build/cli.mjs</code> as part of <code>pnpm build</code>. Imports <code>$lib/utils/config.runtime</code> (never
+    <code>config.ts</code> — <code>$env/dynamic/private</code> isn't available outside SvelteKit).</p>
+
+  <h2>Two ways to invoke</h2>
+  <table>
+    <tr>
+      <th>Form</th>
+      <th>Underneath</th>
+      <th>When</th>
+    </tr>
+    <tr>
+      <td><code>pnpm cli &lt;cmd&gt;</code></td>
+      <td>tsx against TS source; host DB</td>
+      <td>Bare <code>pnpm dev</code> flow; shares state with the running dev server.</td>
+    </tr>
+    <tr>
+      <td><code>pnpm cli:docker &lt;cmd&gt;</code></td>
+      <td><code>docker compose exec app node /app/build/cli.mjs</code></td>
+      <td>When the Docker stack is up (<code>dev:docker</code> or prod). Runs the exact bundle that ships.</td>
+    </tr>
+  </table>
+  <p>Inside the container, <code>wsid &lt;cmd&gt;</code> is a shorter alias. Run with <code>docker compose exec app wsid
+      &lt;cmd&gt;</code></p>
+
+  <h2>Commands</h2>
+  <table>
+    <tr>
+      <th>Command</th>
+      <th>What</th>
+    </tr>
+    <tr>
+      <td><code>migrate</code></td>
+      <td>Apply all pending migrations. Idempotent; also runs at container boot via the entrypoint.</td>
+    </tr>
+    <tr>
+      <td><code>migrate:status</code></td>
+      <td>List each migration as applied (with timestamp) or pending.</td>
+    </tr>
+    <tr>
+      <td><code>migrate:down</code></td>
+      <td>Roll back the most recent migration.</td>
+    </tr>
+  </table>
+  <p>Shortcuts: <code>pnpm migrate</code> ≡ <code>pnpm cli migrate</code>; <code>pnpm migrate:docker</code> ≡ <code>pnpm
+      cli:docker migrate</code>.</p>
+
+  <h2>Adding a migration</h2>
+  <ol>
+    <li>Drop <code>src/lib/store/migrations/YYYY-MM-DD-&lt;name&gt;.ts</code> exporting <code>up</code> /
+      <code>down</code>.</li>
+    <li>Register it in <code>src/lib/store/migrations.bundled.ts</code> — the key MUST match the filename stem (kysely
+      persists it in <code>kysely_migration</code>).</li>
+    <li>Rebuild the image before invoking via <code>:docker</code>: <code>pnpm dev:docker --build</code>.</li>
+  </ol>
+
+  <h2>Adding a command</h2>
+  <p>Add a <code>defineCommand</code> block in <code>src/cli/index.ts</code> and register it under
+    <code>subCommands</code>. Reuse the same DB/config wiring the existing commands use.</p>
+
+  <h2>Why bundle</h2>
+  <p>The runtime image is plain <code>node:22-alpine</code> — no <code>tsx</code>, no <code>pnpm</code>. Bundling to a
+    single <code>.mjs</code> means prod runs vanilla node, the same way SvelteKit's server does. See <a
+      href="setup-docker.html">Docker setup</a> for the bigger picture.</p>
+</body>
+
+</html>

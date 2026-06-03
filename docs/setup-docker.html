@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Docker setup · wsid-svelte</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="top"><a href="index.html">← docs</a></nav>
+<h1>Docker setup</h1>
+<p class="lede">Same compose file runs locally and in production. Two profiles: <code>dev</code> (mailpit on the side), implicit prod (app behind Traefik).</p>
+
+<h2>Profiles</h2>
+<table>
+  <tr><th>Profile</th><th>Services up</th><th>Use</th></tr>
+  <tr><td><code>--profile dev</code></td><td>app, mailpit</td><td>Local prod-matching: image-built app + SMTP catcher for magic links.</td></tr>
+  <tr><td><code>--profile prod</code></td><td>app, traefik</td><td>What runs on the server. HTTPS via Let's Encrypt.</td></tr>
+</table>
+
+<h2>Local prod-matching run</h2>
+<pre><code>pnpm dev:docker              # docker compose --profile dev up --build
+pnpm dev:docker:down         # tear it down</code></pre>
+<p>The app container builds from <code>Dockerfile</code> (multi-stage: deps → build → prod-deps → runtime on <code>node:22-alpine</code>). <code>./data</code> is bind-mounted to <code>/app/data</code> so the SQLite file survives container rebuilds. The entrypoint snapshots the DB, runs <code>node /app/build/cli.mjs migrate</code>, then starts <code>node ./build/index.js</code>.</p>
+<p>Source is <em>not</em> bind-mounted into <code>app</code>. To pick up code changes, rebuild (<code>pnpm dev:docker --build</code>) or use the bare <a href="setup-dev.html">Vite flow</a>.</p>
+
+<h2 id="mailpit">Mailpit only (mixed flow)</h2>
+<p>If you're developing with <code>pnpm dev</code> but want magic links to land somewhere, start just the SMTP catcher:</p>
+<pre><code>pnpm mail:docker             # mailpit on :1125 (SMTP) and :8125 (web UI)
+pnpm mail:docker:down</code></pre>
+<p>Point the app's SMTP env vars at <code>localhost:1125</code>.</p>
+
+<h2>Admin commands against the running container</h2>
+<p>Once the stack is up, the <code>:docker</code>-suffixed scripts exec into <code>app</code> and run the bundled CLI:</p>
+<pre><code>pnpm cli:docker migrate:status
+pnpm migrate:docker
+# Inside the container, `wsid &lt;cmd&gt;` is a shorter alias.</code></pre>
+<p>See <a href="cli.html">CLI</a> for the full command list and the dev/docker invocation matrix.</p>
+
+<h2>Production</h2>
+<p>The server runs the same <code>docker-compose.yml</code> with <code>--profile prod</code>. See <a href="deploy.html">deployment</a> for one-time host setup, DNS, and the GitHub Actions push-to-deploy pipeline.</p>
+</body>
+</html>

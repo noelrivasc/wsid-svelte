@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Agent notes · wsid-svelte</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<nav class="top"><a href="../index.html">← docs</a></nav>
+<h1>Agent notes</h1>
+<p class="lede">Guidance for AI agents working in this repo. Read this before creating or moving files.</p>
+
+<h2>Before touching files</h2>
+<ul>
+  <li>Read <a href="../layout.html">code layout &amp; conventions</a>. Each kind of code has a single predictable home — schemas in <code>schemas/</code>, persistence in <code>store/</code>, pure logic in <code>engine/</code>, presentational code in <code>components/</code>, glue in <code>routes/</code>.</li>
+  <li>Before creating a file or directory, verify the target path against those conventions. If the user-supplied path doesn't match, propose the correct path and confirm before proceeding.</li>
+  <li>Read <a href="../styling.html">styling</a> before adding any UI. The project overrides Tailwind's default red/blue scales; only the documented tokens resolve.</li>
+</ul>
+
+<h2>Configuration access</h2>
+<p>Never read <code>process.env</code> or <code>$env/*</code> directly. Use <code>$lib/utils/config</code> from SvelteKit server code, or <code>$lib/utils/config.runtime</code> from CLI / tsx scripts. See <a href="../env.html">env</a>.</p>
+
+<h2>Database access</h2>
+<p>Routes and components never touch <code>store/db</code> or write SQL. Go through a repository (<code>store/<em>entityRepository</em>.ts</code>) and call named functions. New entity? Add a new repository file.</p>
+
+<h2>Schemas first</h2>
+<p>If a domain shape needs to change, edit the Zod schema in <code>src/lib/schemas/</code> first. The store, engine, and components consume the inferred types — keeping the schema as the single source of truth prevents drift.</p>
+
+<h2>Pure engine</h2>
+<p>Anything in <code>src/lib/engine/</code> must remain pure: no <code>Date.now()</code>, no <code>Math.random()</code>, no IO. IDs and timestamps are passed in from the caller. This is what makes the reducer trivially testable.</p>
+
+<h2>Tests</h2>
+<p>Filename suffix decides where a test runs: <code>*.spec.ts</code> in Node, <code>*.svelte.spec.ts</code> in a real browser. See <a href="../testing.html">testing</a>. Don't re-test third-party libraries; test the <em>contract</em> between your code and them.</p>
+
+<h2>CLI &amp; admin commands</h2>
+<p>Add ops commands as subcommands in <code>src/cli/index.ts</code>, not as one-off scripts under <code>scripts/</code>. The CLI runs identically in dev (tsx) and prod (bundled <code>build/cli.mjs</code>) — see <a href="../cli.html">CLI</a>.</p>
+
+<h2>Don't introduce</h2>
+<ul>
+  <li>A separate JWT layer on top of better-auth sessions.</li>
+  <li>Auto-consuming magic-link GET endpoints. The GET-then-POST flow exists for a reason — see <a href="../auth.html">auth</a>.</li>
+  <li>Branched HTTP responses that reveal whether an account exists.</li>
+  <li>Manual <code>event.cookies.set</code> for the session cookie — better-auth's <code>sveltekitCookies</code> plugin owns that.</li>
+  <li>tsx or pnpm in the production runtime image. Bundle to JS instead.</li>
+</ul>
+</body>
+</html>
