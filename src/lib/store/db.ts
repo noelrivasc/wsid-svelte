@@ -2,7 +2,9 @@ import { mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import Database from 'better-sqlite3';
 import { Kysely, SqliteDialect } from 'kysely';
-import { config } from '$lib/utils/config';
+// Uses `config.runtime` (process.env) because this module is reached from both
+// the SvelteKit server bundle and the standalone CLI bundle. See TODO.md.
+import { config } from '$lib/utils/config.runtime';
 import { type DB } from './schema';
 
 import type { Database as SqliteDatabase } from 'better-sqlite3';

@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3';
 import { Kysely, SqliteDialect } from 'kysely';
-import { sqlSchema, type DB } from '$lib/store/schema';
+import { type DB } from '$lib/store/schema';
+import sqlSchema from '$lib/store/schema.sql?raw';
 
 export function createFreshDb(): Kysely<DB> {
   const sqlite = new Database(':memory:');

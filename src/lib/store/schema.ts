@@ -1,7 +1,3 @@
-import sqlSchema from './schema.sql?raw';
-
-export { sqlSchema };
-
 export interface DecisionsTable {
   id: string;
   title: string;

@@ -6,4 +6,6 @@ if [ -f "$DB" ]; then
   cp "$DB" "${DB}.bak-$(date +%s)" || true
 fi
 
+node /app/build/cli.mjs migrate
+
 exec node ./build/index.js

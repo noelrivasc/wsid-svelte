@@ -32,6 +32,10 @@ COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=build /app/build ./build
 COPY --from=build /app/package.json ./package.json
 COPY docker/entrypoint.sh ./entrypoint.sh
+# Convenience wrapper so admin commands look the same in any shell:
+#   docker compose exec app wsid migrate
+RUN printf '#!/bin/sh\nexec node /app/build/cli.mjs "$@"\n' > /usr/local/bin/wsid \
+    && chmod +x /usr/local/bin/wsid
 RUN chmod +x ./entrypoint.sh \
     && mkdir -p /app/data
 EXPOSE 3000
