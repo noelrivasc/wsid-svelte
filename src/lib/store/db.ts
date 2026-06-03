@@ -3,7 +3,7 @@ import { dirname } from 'node:path';
 import Database from 'better-sqlite3';
 import { Kysely, SqliteDialect } from 'kysely';
 import { config } from '$lib/utils/config';
-import { sqlSchema, type DB } from './schema';
+import { type DB } from './schema';
 
 import type { Database as SqliteDatabase } from 'better-sqlite3';
 
@@ -14,7 +14,6 @@ export function createSqlite(path: string): SqliteDatabase {
   sqlite.pragma('journal_mode = WAL');
   sqlite.pragma('synchronous = NORMAL');
   sqlite.pragma('foreign_keys = ON');
-  sqlite.exec(sqlSchema);
   return sqlite;
 }
 
