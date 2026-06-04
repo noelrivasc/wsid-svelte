@@ -22,8 +22,8 @@
     "mail:docker:down": "docker compose --profile dev down mailpit",
     "test:unit": "vitest",
     "test": "vitest --run; echo '\\nNote: on a cold Storybook cache, the first run may report errors from flowbite-svelte <Label> (Cannot read properties of null reading nodes) in form stories. The pre-bundle stabilises on a second pass — re-run `pnpm test` to confirm.'",
-    "docs": "echo 'Docs at http://localhost:8081' && python3 -m http.server 8081 --directory docs",
-    "storybook": "storybook dev -p 6006",
+    "serve-docs": "echo 'Docs at http://localhost:8081' && python3 -m http.server 8081 --directory docs",
+    "storybook": "storybook dev -p 6006 --no-open",
     "build-storybook": "storybook build"
   },
   "devDependencies": {
