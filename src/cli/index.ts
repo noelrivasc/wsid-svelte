@@ -15,6 +15,7 @@ import {
   sampleDecisionId,
   sampleInitialMetadata,
 } from '../lib/test_data/actions';
+import { sampleUser, sampleUserId } from '../lib/test_data/user';
 
 function migrator() {
   return createMigrator(config.databasePath, bundledMigrationProvider);
@@ -87,9 +88,22 @@ const seed = defineCommand({
       }
 
       const now = new Date().toISOString();
-      await createDecision(sampleDecisionId, sampleInitialMetadata, now, db);
+
+      const existingUser = await db
+        .selectFrom('user')
+        .select('id')
+        .where('id', '=', sampleUserId)
+        .executeTakeFirst();
+      if (!existingUser) {
+        await db
+          .insertInto('user')
+          .values({ ...sampleUser, createdAt: now, updatedAt: now })
+          .execute();
+      }
+
+      await createDecision(sampleDecisionId, sampleInitialMetadata, now, sampleUserId, db);
       for (const action of sampleActions) {
-        await appendAction(sampleDecisionId, action, now, db);
+        await appendAction(sampleDecisionId, action, now, sampleUserId, db);
       }
       console.log(
         `Seeded ${sampleActions.length + 1} actions into ${config.databasePath}.`,

@@ -15,14 +15,32 @@ export interface DecisionListItem {
   title: string;
 }
 
-export async function loadDecisionList(db?: Kysely<DB>): Promise<DecisionListItem[]> {
-  const c = db ?? (await getConnection());
-  return c.selectFrom('decisions').select(['id', 'title']).orderBy('title').execute();
+// Thrown when a caller tries to read or mutate a decision they do not own.
+export class OwnershipError extends Error {
+  constructor(decisionId: string) {
+    super(`Decision ${decisionId} is not owned by this user`);
+    this.name = 'OwnershipError';
+  }
 }
 
-// Returns null if the decision does not exist, [] if it exists with no actions.
+export async function loadDecisionList(
+  userId: string,
+  db?: Kysely<DB>
+): Promise<DecisionListItem[]> {
+  const c = db ?? (await getConnection());
+  return c
+    .selectFrom('decisions')
+    .select(['id', 'title'])
+    .where('user_id', '=', userId)
+    .orderBy('title')
+    .execute();
+}
+
+// Returns null if the decision does not exist or is not owned by userId,
+// [] if it exists (and is owned) with no actions.
 export async function loadActions(
   decisionId: string,
+  userId: string,
   db?: Kysely<DB>
 ): Promise<Action[] | null> {
   const c = db ?? (await getConnection());
@@ -31,6 +49,7 @@ export async function loadActions(
     .leftJoin('actions as a', 'a.decision_id', 'd.id')
     .select(['a.type', 'a.version', 'a.payload', 'a.seq'])
     .where('d.id', '=', decisionId)
+    .where('d.user_id', '=', userId)
     .orderBy('a.seq')
     .execute();
   if (rows.length === 0) return null;
@@ -50,13 +69,14 @@ export async function createDecision(
   decisionId: string,
   metadata: DecisionMetadata,
   createdAt: string,
+  userId: string,
   db?: Kysely<DB>
 ): Promise<void> {
   const c = db ?? (await getConnection());
   await c.transaction().execute(async (tx) => {
     await tx
       .insertInto('decisions')
-      .values({ id: decisionId, title: metadata.title })
+      .values({ id: decisionId, title: metadata.title, user_id: userId })
       .execute();
     await tx
       .insertInto('actions')
@@ -78,6 +98,7 @@ export async function appendAction(
   decisionId: string,
   action: Action,
   createdAt: string,
+  userId: string,
   db?: Kysely<DB>
 ): Promise<{ seq: number }> {
   actionSchema.parse(action);
@@ -87,6 +108,13 @@ export async function appendAction(
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
       return await c.transaction().execute(async (tx) => {
+        const owner = await tx
+          .selectFrom('decisions')
+          .select('user_id')
+          .where('id', '=', decisionId)
+          .executeTakeFirst();
+        if (!owner || owner.user_id !== userId) throw new OwnershipError(decisionId);
+
         const row = await tx
           .selectFrom('actions')
           .select((eb) => eb.fn.max('seq').as('max'))

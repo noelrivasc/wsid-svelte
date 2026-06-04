@@ -7,9 +7,11 @@
 import type { Migration, MigrationProvider } from 'kysely';
 
 import * as m20260525InitialState from './migrations/2026-05-25-initial-state';
+import * as m20260604DecisionUser from './migrations/2026-06-04-decision-user';
 
 const migrations: Record<string, Migration> = {
   '2026-05-25-initial-state': m20260525InitialState,
+  '2026-06-04-decision-user': m20260604DecisionUser,
 };
 
 export const bundledMigrationProvider: MigrationProvider = {

@@ -1,6 +1,7 @@
 export interface DecisionsTable {
   id: string;
   title: string;
+  user_id: string | null;
 }
 
 export interface ActionsTable {

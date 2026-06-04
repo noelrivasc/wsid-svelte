@@ -3,3 +3,4 @@ export * from './scenarios';
 export * from './decisionMetadata';
 export * from './decision';
 export * from './actions';
+export * from './user';
