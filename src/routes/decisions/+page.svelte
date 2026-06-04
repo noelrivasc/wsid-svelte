@@ -2,9 +2,19 @@
 	import type { PageProps } from './$types';
 	let { data }: PageProps = $props();
   import { resolve } from '$app/paths';
+	import { PlusOutline } from 'flowbite-svelte-icons';
 </script>
 
-<h1 class="text-3xl font-semibold text-heading">Decisions</h1>
+<div class="flex items-center justify-between">
+	<h1 class="text-3xl font-semibold text-heading">Decisions</h1>
+	<a
+		href={resolve('/decisions/new')}
+		class="flex shrink-0 items-center justify-center gap-2 rounded-full bg-cta px-4 py-2 text-body-inverted hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-c02"
+	>
+		New decision
+		<PlusOutline class="h-5 w-5" />
+	</a>
+</div>
 
 {#if data.decisions.length === 0}
 	<p class="mt-2 text-body-subtle">No decisions yet.</p>

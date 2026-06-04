@@ -66,12 +66,12 @@ export async function loadActions(
 // Create the canvas: insert the decisions row and append the first updateMetadata
 // action (which is the only thing that ever sets metadata on the canvas).
 export async function createDecision(
-  decisionId: string,
   metadata: DecisionMetadata,
   createdAt: string,
   userId: string,
+  decisionId: string = crypto.randomUUID(),
   db?: Kysely<DB>
-): Promise<void> {
+): Promise<string> {
   const c = db ?? (await getConnection());
   await c.transaction().execute(async (tx) => {
     await tx
@@ -90,6 +90,7 @@ export async function createDecision(
       })
       .execute();
   });
+  return decisionId;
 }
 
 // Append an action onto an existing decision. createdAt is supplied by caller

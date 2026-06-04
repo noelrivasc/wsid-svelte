@@ -26,7 +26,7 @@ async function insertUser(db: Kysely<DB>, id: string, email: string) {
 
 async function seed(db: Kysely<DB>) {
   await insertUser(db, sampleUserId, sampleUser.email);
-  await createDecision(sampleDecisionId, sampleInitialMetadata, ts, sampleUserId, db);
+  await createDecision(sampleInitialMetadata, ts, sampleUserId, sampleDecisionId, db);
   for (const a of sampleActions) {
     await appendAction(sampleDecisionId, a, ts, sampleUserId, db);
   }

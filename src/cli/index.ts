@@ -101,7 +101,7 @@ const seed = defineCommand({
           .execute();
       }
 
-      await createDecision(sampleDecisionId, sampleInitialMetadata, now, sampleUserId, db);
+      await createDecision(sampleInitialMetadata, now, sampleUserId, sampleDecisionId, db);
       for (const action of sampleActions) {
         await appendAction(sampleDecisionId, action, now, sampleUserId, db);
       }
