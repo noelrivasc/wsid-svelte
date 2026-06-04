@@ -13,19 +13,30 @@ pnpm migrate                # creates data/wsid.db
 pnpm dev                    # http://localhost:5173
 ```
 
-## Dev environment (tmux)
+## Dev environment
 
-`./tmux-setup.sh` spins up the whole dev environment — editor, agent, and the app/docs/storybook/mailpit processes — in a single tmux session (macOS).
+### Plain pnpm
 
-Beyond the Quick start deps, this needs `tmux`, plus `nvim` and `claude` for the tools window (and Docker, since mailpit always runs in a container).
+Run each process in its own terminal:
 
 ```sh
-./tmux-setup.sh up [vite|docker]   # setup + tools + dev processes, then attach
-./tmux-setup.sh open [target]      # open dev URLs in the browser (app|storybook|mailpit|docs|all)
-./tmux-setup.sh stop-dev           # stop the app/docs/storybook/mailpit processes
+pnpm dev           # app          → http://localhost:5173
+pnpm serve-docs    # docs         → http://localhost:8081
+pnpm storybook     # storybook    → http://localhost:6006
+pnpm mail:docker   # mailpit      → http://localhost:8125 (needs Docker)
 ```
 
-Other sub-commands: `setup`, `start-dev`, `start-tools`, `attach`.
+For the dockerised app, use `pnpm dev:docker` (→ http://localhost:3000) in place of `pnpm dev`.
+
+### tmux
+
+`./tmux-setup.sh` spins up the whole dev environment — editor, agent, and the app/docs/storybook/mailpit processes — in a single tmux session (macOS). Beyond the Quick start deps, this needs `tmux`, plus `nvim` and `claude` for the tools window (and Docker, since mailpit always runs in a container).
+
+```sh
+just up        # setup + tools + dev processes, then attach
+```
+
+Run `just --list` for all recipes, or `./tmux-setup.sh` with no args to see the script's sub-commands.
 
 ## Documentation
 
