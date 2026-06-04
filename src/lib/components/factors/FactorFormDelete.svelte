@@ -41,7 +41,7 @@
 			class="border-c03 text-body hover:text-body/90 focus:ring-c01"
 			onclick={onCancel}>Cancel</Button
 		>
-		<Button type="submit" class="bg-red text-body-inverted hover:bg-red/90 focus:ring-c01">
+		<Button type="submit" class="bg-cta text-body-inverted hover:bg-cta/90 focus:ring-c01">
 			Delete
 		</Button>
 	</div>
