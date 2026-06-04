@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import {
 		Navbar,
 		NavBrand,
@@ -9,6 +10,11 @@
 		DropdownDivider
 	} from 'flowbite-svelte';
 	import { BrainOutline, UserCircleSolid, ChevronDownOutline } from 'flowbite-svelte-icons';
+
+	type Props = {
+		user: App.Locals['user'];
+	};
+	let { user }: Props = $props();
 
 	let userMenuOpen = $state(false);
 </script>
@@ -33,11 +39,28 @@
 			<ChevronDownOutline class="h-4 w-4" />
 		</button>
 		<Dropdown bind:isOpen={userMenuOpen} simple class="w-44">
-			<DropdownHeader>
-				<span class="block text-sm">Signed out</span>
-			</DropdownHeader>
-			<DropdownDivider />
-			<DropdownItem href="/decisions">Decisions</DropdownItem>
+			{#if user}
+				<DropdownHeader>
+					<span class="block truncate text-sm">{user.email}</span>
+				</DropdownHeader>
+				<DropdownItem href="/decisions">Decisions</DropdownItem>
+				<DropdownDivider />
+				<form method="POST" action="/users/logout" use:enhance>
+					<DropdownItem
+						onclick={(e: MouseEvent) =>
+							(e.currentTarget as HTMLElement).closest('form')?.requestSubmit()}
+					>
+						Sign out
+					</DropdownItem>
+				</form>
+			{:else}
+				<DropdownHeader>
+					<span class="block text-sm">Signed out</span>
+				</DropdownHeader>
+				<DropdownDivider />
+				<DropdownItem href="/users/login">Login</DropdownItem>
+				<DropdownItem href="/users/register">Sign up</DropdownItem>
+			{/if}
 		</Dropdown>
 		<NavHamburger />
 	</div>
