@@ -22,3 +22,5 @@
 </script>
 
 <Story name="Default" />
+
+<Story name="Read-only" args={{ readOnly: true }} />

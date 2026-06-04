@@ -5,13 +5,16 @@
 
 	type Props = {
 		factor: Factor;
-		onEdit: (factor: Factor) => void;
-		onDelete: (factor: Factor) => void;
+		readOnly?: boolean;
+		onEdit?: (factor: Factor) => void;
+		onDelete?: (factor: Factor) => void;
 	};
-	let { factor, onEdit, onDelete }: Props = $props();
+	let { factor, readOnly = false, onEdit, onDelete }: Props = $props();
+
+	const gridCols = $derived(readOnly ? 'grid-cols-[56px_1fr]' : 'grid-cols-[56px_1fr_auto_auto]');
 </script>
 
-<li class="grid grid-cols-[56px_1fr_auto_auto] items-center gap-2 border-b border-c01 py-3 last:border-b-0">
+<li class="grid {gridCols} items-center gap-2 border-b border-c01 py-3 last:border-b-0">
 	<div class="flex justify-center">
 		<WeightCircle weight={factor.weight} />
 	</div>
@@ -23,21 +26,23 @@
 		{/if}
 	</div>
 
-	<button
-		type="button"
-		onclick={() => onEdit(factor)}
-		class="rounded-full p-2 text-body-subtle hover:bg-c01 hover:text-body focus:outline-none focus:ring-2 focus:ring-c02"
-		aria-label="Edit {factor.title}"
-	>
-		<EditOutline class="h-5 w-5" />
-	</button>
+	{#if !readOnly}
+		<button
+			type="button"
+			onclick={() => onEdit?.(factor)}
+			class="rounded-full p-2 text-body-subtle hover:bg-c01 hover:text-body focus:outline-none focus:ring-2 focus:ring-c02"
+			aria-label="Edit {factor.title}"
+		>
+			<EditOutline class="h-5 w-5" />
+		</button>
 
-	<button
-		type="button"
-		onclick={() => onDelete(factor)}
-		class="rounded-full p-2 text-body-subtle hover:bg-c01 hover:text-red focus:outline-none focus:ring-2 focus:ring-c02"
-		aria-label="Delete {factor.title}"
-	>
-		<TrashBinOutline class="h-5 w-5" />
-	</button>
+		<button
+			type="button"
+			onclick={() => onDelete?.(factor)}
+			class="rounded-full p-2 text-body-subtle hover:bg-c01 hover:text-red focus:outline-none focus:ring-2 focus:ring-c02"
+			aria-label="Delete {factor.title}"
+		>
+			<TrashBinOutline class="h-5 w-5" />
+		</button>
+	{/if}
 </li>

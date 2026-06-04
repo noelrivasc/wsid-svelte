@@ -5,11 +5,12 @@
 
 	type Props = {
 		factors: Factors;
-		onAdd: () => void;
-		onEdit: (factor: Factor) => void;
-		onDelete: (factor: Factor) => void;
+		readOnly?: boolean;
+		onAdd?: () => void;
+		onEdit?: (factor: Factor) => void;
+		onDelete?: (factor: Factor) => void;
 	};
-	let { factors, onAdd, onEdit, onDelete }: Props = $props();
+	let { factors, readOnly = false, onAdd, onEdit, onDelete }: Props = $props();
 </script>
 
 <section>
@@ -21,14 +22,16 @@
 				outcome relative to the others.
 			</p>
 		</div>
-		<button
-			type="button"
-			onclick={onAdd}
-			class="flex shrink-0 items-center justify-center rounded-full bg-cta p-2 text-body-inverted hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-c02"
-			aria-label="Add factor"
-		>
-			<PlusOutline class="h-5 w-5" />
-		</button>
+		{#if !readOnly}
+			<button
+				type="button"
+				onclick={onAdd}
+				class="flex shrink-0 items-center justify-center rounded-full bg-cta p-2 text-body-inverted hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-c02"
+				aria-label="Add factor"
+			>
+				<PlusOutline class="h-5 w-5" />
+			</button>
+		{/if}
 	</header>
 
 	{#if factors.length === 0}
@@ -36,7 +39,7 @@
 	{:else}
 		<ul class="mt-4">
 			{#each factors as factor (factor.id ?? factor.title)}
-				<FactorRow {factor} {onEdit} {onDelete} />
+				<FactorRow {factor} {readOnly} {onEdit} {onDelete} />
 			{/each}
 		</ul>
 	{/if}

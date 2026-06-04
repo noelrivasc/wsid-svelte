@@ -5,11 +5,12 @@
 
 	type Props = {
 		scenarios: ScenariosList;
-		onAdd: () => void;
-		onEdit: (scenario: Scenario) => void;
-		onDelete: (scenario: Scenario) => void;
+		readOnly?: boolean;
+		onAdd?: () => void;
+		onEdit?: (scenario: Scenario) => void;
+		onDelete?: (scenario: Scenario) => void;
 	};
-	let { scenarios, onAdd, onEdit, onDelete }: Props = $props();
+	let { scenarios, readOnly = false, onAdd, onEdit, onDelete }: Props = $props();
 </script>
 
 <section>
@@ -21,14 +22,16 @@
 				factors.
 			</p>
 		</div>
-		<button
-			type="button"
-			onclick={onAdd}
-			class="flex shrink-0 items-center justify-center rounded-full bg-cta p-2 text-body-inverted hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-c02"
-			aria-label="Add scenario"
-		>
-			<PlusOutline class="h-5 w-5" />
-		</button>
+		{#if !readOnly}
+			<button
+				type="button"
+				onclick={onAdd}
+				class="flex shrink-0 items-center justify-center rounded-full bg-cta p-2 text-body-inverted hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-c02"
+				aria-label="Add scenario"
+			>
+				<PlusOutline class="h-5 w-5" />
+			</button>
+		{/if}
 	</header>
 
 	{#if scenarios.length === 0}
@@ -36,7 +39,7 @@
 	{:else}
 		<ul class="mt-4">
 			{#each scenarios as scenario (scenario.id ?? scenario.title)}
-				<ScenarioRow {scenario} {onEdit} {onDelete} />
+				<ScenarioRow {scenario} {readOnly} {onEdit} {onDelete} />
 			{/each}
 		</ul>
 	{/if}

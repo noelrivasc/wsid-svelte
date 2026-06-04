@@ -10,16 +10,18 @@
 
 	type Props = {
 		decision: Decision;
-		onEditMetadata: () => void;
-		onAddFactor: () => void;
-		onEditFactor: (factor: Factor) => void;
-		onDeleteFactor: (factor: Factor) => void;
-		onAddScenario: () => void;
-		onEditScenario: (scenario: Scenario) => void;
-		onDeleteScenario: (scenario: Scenario) => void;
+		readOnly?: boolean;
+		onEditMetadata?: () => void;
+		onAddFactor?: () => void;
+		onEditFactor?: (factor: Factor) => void;
+		onDeleteFactor?: (factor: Factor) => void;
+		onAddScenario?: () => void;
+		onEditScenario?: (scenario: Scenario) => void;
+		onDeleteScenario?: (scenario: Scenario) => void;
 	};
 	let {
 		decision,
+		readOnly = false,
 		onEditMetadata,
 		onAddFactor,
 		onEditFactor,
@@ -44,7 +46,7 @@
 </script>
 
 <article class="flex flex-col gap-8">
-	<DecisionMetadata metadata={decision.metadata} onEdit={onEditMetadata} />
+	<DecisionMetadata metadata={decision.metadata} {readOnly} onEdit={onEditMetadata} />
 
 	<Label class="max-w-xs space-y-2">
 		<span>View mode</span>
@@ -54,6 +56,7 @@
 	{#if showFactors}
 		<FactorsList
 			factors={decision.factors}
+			{readOnly}
 			onAdd={onAddFactor}
 			onEdit={onEditFactor}
 			onDelete={onDeleteFactor}
@@ -63,6 +66,7 @@
 	{#if showScenarios}
 		<ScenariosList
 			scenarios={decision.scenarios}
+			{readOnly}
 			onAdd={onAddScenario}
 			onEdit={onEditScenario}
 			onDelete={onDeleteScenario}
