@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { resolve } from '$app/paths';
   import UserEmailForm from './UserEmailForm.svelte';
 
   type Props = {
@@ -6,9 +7,11 @@
     mockSubmit?: (data: Record<string, FormDataEntryValue>) => void;
   };
   let { onSuccess, mockSubmit }: Props = $props();
-
-  const footerHtml =
-    'No account yet? <a href="/users/register" class="text-cta hover:underline">Sign up</a>.';
 </script>
 
-<UserEmailForm submitLabel="Send me a login link" {footerHtml} {onSuccess} {mockSubmit} />
+<UserEmailForm submitLabel="Send me a login link" {onSuccess} {mockSubmit}>
+  {#snippet footer()}
+    No account yet?
+    <a href={resolve('/users/register')} class="text-cta hover:underline">Sign up</a>.
+  {/snippet}
+</UserEmailForm>

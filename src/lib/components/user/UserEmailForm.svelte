@@ -1,16 +1,17 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
   import type { SubmitFunction } from '@sveltejs/kit';
+  import type { Snippet } from 'svelte';
   import { Label, Input, Button } from 'flowbite-svelte';
 
   type Props = {
     action?: string;
     submitLabel: string;
     onSuccess?: () => void;
-    footerHtml: string;
+    footer: Snippet;
     mockSubmit?: (data: Record<string, FormDataEntryValue>) => void;
   };
-  let { action = '', submitLabel, footerHtml, onSuccess, mockSubmit }: Props = $props();
+  let { action = '', submitLabel, footer, onSuccess, mockSubmit }: Props = $props();
 
   const submit: SubmitFunction = ({ formData, cancel }) => {
     if (mockSubmit) {
@@ -35,5 +36,5 @@
     {submitLabel}
   </Button>
 
-  <p>{@html footerHtml}</p>
+  <p>{@render footer()}</p>
 </form>
