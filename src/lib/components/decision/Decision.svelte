@@ -12,6 +12,7 @@
     decision: Decision;
     readOnly?: boolean;
     onEditMetadata?: () => void;
+    onMakePublic?: () => void;
     onAddFactor?: () => void;
     onEditFactor?: (factor: Factor) => void;
     onDeleteFactor?: (factor: Factor) => void;
@@ -23,6 +24,7 @@
     decision,
     readOnly = false,
     onEditMetadata,
+    onMakePublic,
     onAddFactor,
     onEditFactor,
     onDeleteFactor,
@@ -46,7 +48,12 @@
 </script>
 
 <article class="flex flex-col gap-8">
-  <DecisionMetadata metadata={decision.metadata} {readOnly} onEdit={onEditMetadata} />
+  <DecisionMetadata
+    metadata={decision.metadata}
+    {readOnly}
+    onEdit={onEditMetadata}
+    {onMakePublic}
+  />
 
   <Label class="max-w-xs space-y-2">
     <span>View mode</span>
