@@ -3,6 +3,7 @@
   import { fn } from 'storybook/test';
   import ScenarioFormAdd from './ScenarioFormAdd.svelte';
   import ScenarioFormEdit from './ScenarioFormEdit.svelte';
+  import ScenarioFormDelete from './ScenarioFormDelete.svelte';
   import { formSampleScenario, formMinimalScenario } from '$lib/test_data';
 
   const { Story } = defineMeta({
@@ -29,4 +30,8 @@
 
 <Story name="ScenarioFormEdit: minimal">
   <ScenarioFormEdit scenario={formMinimalScenario} mockSubmit={fn()} onCancel={fn()} />
+</Story>
+
+<Story name="ScenarioFormDelete">
+  <ScenarioFormDelete scenario={formSampleScenario} mockSubmit={fn()} onCancel={fn()} />
 </Story>

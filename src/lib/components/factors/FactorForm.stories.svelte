@@ -3,6 +3,7 @@
   import { fn } from 'storybook/test';
   import FactorFormAdd from './FactorFormAdd.svelte';
   import FactorFormEdit from './FactorFormEdit.svelte';
+  import FactorFormDelete from './FactorFormDelete.svelte';
   import { formSampleFactor, formMinimalFactor } from '$lib/test_data';
 
   const { Story } = defineMeta({
@@ -29,4 +30,8 @@
 
 <Story name="FactorFormEdit: minimal">
   <FactorFormEdit factor={formMinimalFactor} mockSubmit={fn()} mockDelete={fn()} onCancel={fn()} />
+</Story>
+
+<Story name="FactorFormDelete">
+  <FactorFormDelete factor={formSampleFactor} mockSubmit={fn()} onCancel={fn()} />
 </Story>
