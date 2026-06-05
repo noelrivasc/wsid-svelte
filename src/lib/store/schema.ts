@@ -1,7 +1,10 @@
+import type { Generated } from 'kysely';
+
 export interface DecisionsTable {
   id: string;
   title: string;
   user_id: string | null;
+  is_public: Generated<number>; // 0 | 1 (sqlite boolean); defaults to 0
 }
 
 export interface ActionsTable {
