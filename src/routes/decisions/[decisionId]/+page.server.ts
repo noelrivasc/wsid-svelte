@@ -1,15 +1,29 @@
 import type { Actions, PageServerLoad } from './$types';
-import { loadActions, appendAction, OwnershipError } from '$lib/store/decisionRepository';
+import {
+  loadActions,
+  appendAction,
+  isOwner,
+  isPublic,
+  setPublicStatus,
+  OwnershipError
+} from '$lib/store/decisionRepository';
 import { hydrate } from '$lib/engine/reducer';
 import { decisionMetadataSchema, factorSchema, scenarioSchema, type Action } from '$lib/schemas';
-import { error, fail, redirect } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 import { z } from 'zod';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
-  if (!locals.user) throw redirect(302, '/users/login');
-  const decision = hydrate(await loadActions(params.decisionId, locals.user.id));
+  // NOTE that there's no auth check: loadActions ensures that only
+  // public or own decisions are loaded
+  const decision = hydrate(await loadActions(params.decisionId, locals.user?.id));
   if (decision === null) throw error(404, 'Decision not found');
-  return { decisionId: params.decisionId, decision };
+  const owner = await isOwner(params.decisionId, locals.user?.id);
+  return {
+    decisionId: params.decisionId,
+    decision,
+    readOnly: !owner,
+    isPublic: owner ? await isPublic(params.decisionId) : false
+  };
 };
 
 const now = () => new Date().toISOString();
@@ -130,6 +144,20 @@ export const actions: Actions = {
       version: 1,
       payload: { id: parsed.data }
     });
+  },
+
+  // Plain (non-event-sourced) action: flips the is_public column on the row.
+  setPublicStatus: async ({ request, params, locals }) => {
+    if (!locals.user) return fail(401, { error: 'Not authenticated' });
+    const data = await request.formData();
+    const isPublic = data.get('isPublic') === 'on' || data.get('isPublic') === 'true';
+    try {
+      await setPublicStatus(params.decisionId, isPublic, locals.user.id);
+      return { ok: true };
+    } catch (err) {
+      if (err instanceof OwnershipError) return fail(403, { error: 'Forbidden' });
+      throw err;
+    }
   },
 
   setValue: async ({ request, params, locals }) => {

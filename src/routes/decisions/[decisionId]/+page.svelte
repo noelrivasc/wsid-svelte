@@ -4,6 +4,7 @@
   import { sineIn } from 'svelte/easing';
   import Decision from '$lib/components/decision/Decision.svelte';
   import DecisionMetadataFormEdit from '$lib/components/decision/DecisionMetadataFormEdit.svelte';
+  import DecisionPublishForm from '$lib/components/decision/DecisionPublishForm.svelte';
   import FactorFormAdd from '$lib/components/factors/FactorFormAdd.svelte';
   import FactorFormEdit from '$lib/components/factors/FactorFormEdit.svelte';
   import FactorFormDelete from '$lib/components/factors/FactorFormDelete.svelte';
@@ -15,6 +16,7 @@
   let { data }: PageProps = $props();
 
   let editMetadataOpen = $state(false);
+  let makePublicOpen = $state(false);
   let addFactorOpen = $state(false);
   let editFactorOpen = $state(false);
   let deleteFactorOpen = $state(false);
@@ -52,7 +54,9 @@
 
 <Decision
   decision={data.decision}
+  readOnly={data.readOnly}
   onEditMetadata={() => (editMetadataOpen = true)}
+  onMakePublic={() => (makePublicOpen = true)}
   onAddFactor={() => (addFactorOpen = true)}
   onEditFactor={openEditFactor}
   onDeleteFactor={openDeleteFactor}
@@ -60,6 +64,22 @@
   onEditScenario={openEditScenario}
   onDeleteScenario={openDeleteScenario}
 />
+
+{#if !data.readOnly}
+  <Drawer
+    bind:open={makePublicOpen}
+    placement="right"
+    {transitionParams}
+    class="w-full max-w-md p-6"
+  >
+    <h2 class="mb-4 text-xl font-semibold text-heading">Make public</h2>
+    <DecisionPublishForm
+      isPublic={data.isPublic}
+      onCancel={() => (makePublicOpen = false)}
+      onSuccess={() => (makePublicOpen = false)}
+    />
+  </Drawer>
+{/if}
 
 <Drawer
   bind:open={editMetadataOpen}
