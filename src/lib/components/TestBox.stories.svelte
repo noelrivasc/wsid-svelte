@@ -27,4 +27,6 @@
 	`as any` bypasses the compile-time type check so the runtime guard has
 	something to catch — that's the whole point of this story.
 -->
+
+<!-- eslint-disable-next-line @typescript-eslint/no-explicit-any -->
 <Story name="InvalidProps" args={{ color: 'green' as any, text: '' }} />

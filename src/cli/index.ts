@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 // Bundled CLI for admin/ops tasks. Compiled to build/cli.mjs by esbuild
 // (see `pnpm build:cli`) and invoked in prod via:
 //   docker compose exec app node /app/build/cli.mjs <command>

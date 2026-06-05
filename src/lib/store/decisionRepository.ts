@@ -48,7 +48,7 @@ export async function loadActions(
     .selectFrom('decisions as d')
     .leftJoin('actions as a', 'a.decision_id', 'd.id')
     .select(['a.type', 'a.version', 'a.payload', 'a.seq'])
-    .where('d.id', '=', decisionId)
+    .where('d.id', '=', decisionId);
 
   if (userId) {
     query = query.where((eb) => eb.or([eb('d.user_id', '=', userId), eb('d.is_public', '=', 1)]));
