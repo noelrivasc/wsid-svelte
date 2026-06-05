@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
+  import type { SubmitFunction } from '@sveltejs/kit';
   import {
     Navbar,
     NavBrand,
@@ -13,10 +14,20 @@
 
   type Props = {
     user: App.Locals['user'];
+    // mockSubmit intercepts submission, cancels network call, to test actions in Storybook
+    mockSubmit?: (data: Record<string, FormDataEntryValue>) => void;
   };
-  let { user }: Props = $props();
+  let { user, mockSubmit }: Props = $props();
 
   let userMenuOpen = $state(false);
+
+  const submit: SubmitFunction = ({ formData, cancel }) => {
+    if (mockSubmit) {
+      mockSubmit(Object.fromEntries(formData));
+      cancel();
+      return;
+    }
+  };
 </script>
 
 <Navbar fluid class="border-b border-c01 bg-ground" navContainerClass="max-w-5xl mx-auto">
@@ -41,7 +52,7 @@
         </DropdownHeader>
         <DropdownItem href="/decisions">Decisions</DropdownItem>
         <DropdownDivider />
-        <form method="POST" action="/users/logout" use:enhance>
+        <form method="POST" action="/users/logout" use:enhance={submit}>
           <DropdownItem
             onclick={(e: MouseEvent) =>
               (e.currentTarget as HTMLElement).closest('form')?.requestSubmit()}
