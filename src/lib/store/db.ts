@@ -10,7 +10,6 @@ import { type DB } from './schema';
 import type { Database as SqliteDatabase } from 'better-sqlite3';
 
 export function createSqlite(path: string): SqliteDatabase {
-
   mkdirSync(dirname(path), { recursive: true });
   const sqlite = new Database(path);
   sqlite.pragma('journal_mode = WAL');

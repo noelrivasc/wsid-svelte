@@ -1,20 +1,20 @@
 <script module lang="ts">
-	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import { fn } from 'storybook/test';
-	import ScenariosList from './ScenariosList.svelte';
-	import { sampleScenarios } from '$lib/test_data';
+  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import { fn } from 'storybook/test';
+  import ScenariosList from './ScenariosList.svelte';
+  import { sampleScenarios } from '$lib/test_data';
 
-	const { Story } = defineMeta({
-		title: 'Components/Scenarios/ScenariosList',
-		component: ScenariosList,
-		tags: ['autodocs'],
-		args: {
-			scenarios: sampleScenarios,
-			onAdd: fn(),
-			onEdit: fn(),
-			onDelete: fn()
-		}
-	});
+  const { Story } = defineMeta({
+    title: 'Components/Scenarios/ScenariosList',
+    component: ScenariosList,
+    tags: ['autodocs'],
+    args: {
+      scenarios: sampleScenarios,
+      onAdd: fn(),
+      onEdit: fn(),
+      onDelete: fn()
+    }
+  });
 </script>
 
 <Story name="Default" />

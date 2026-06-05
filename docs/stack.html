@@ -1,49 +1,103 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<title>Stack · wsid-svelte</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<nav class="top"><a href="index.html">← docs</a></nav>
-<h1>Stack</h1>
-<p class="lede">What each tool does here, and why it earned a place in the tree.</p>
+  <head>
+    <meta charset="utf-8" />
+    <title>Stack · wsid-svelte</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <nav class="top"><a href="index.html">← docs</a></nav>
+    <h1>Stack</h1>
+    <p class="lede">What each tool does here, and why it earned a place in the tree.</p>
 
-<h2>SvelteKit (Svelte 5)</h2>
-<p>The app framework. Routes under <code>src/routes/</code> are thin glue — they load via the store, run pure engine code, and render components. Server entry points (<code>+page.server.ts</code>, <code>hooks.server.ts</code>) own all IO. Built with the <code>@sveltejs/adapter-node</code> adapter so the prod image runs <code>node ./build/index.js</code>.</p>
+    <h2>SvelteKit (Svelte 5)</h2>
+    <p>
+      The app framework. Routes under <code>src/routes/</code> are thin glue — they load via the
+      store, run pure engine code, and render components. Server entry points
+      (<code>+page.server.ts</code>, <code>hooks.server.ts</code>) own all IO. Built with the
+      <code>@sveltejs/adapter-node</code> adapter so the prod image runs
+      <code>node ./build/index.js</code>.
+    </p>
 
-<h2>Vite</h2>
-<p>Dev server, HMR, and production bundler under SvelteKit. Also drives Vitest's two test projects (see <a href="testing.html">testing</a>). The CLI bundle is built separately with esbuild — see <a href="cli.html">CLI</a>.</p>
+    <h2>Vite</h2>
+    <p>
+      Dev server, HMR, and production bundler under SvelteKit. Also drives Vitest's two test
+      projects (see <a href="testing.html">testing</a>). The CLI bundle is built separately with
+      esbuild — see <a href="cli.html">CLI</a>.
+    </p>
 
-<h2>Tailwind v4</h2>
-<p>Utility CSS via <code>@tailwindcss/vite</code>. Theme tokens live in <code>src/lib/app.css</code> using <code>@theme</code>; utilities like <code>bg-ground</code>, <code>text-body</code> auto-generate from them. See <a href="styling.html">styling</a>.</p>
+    <h2>Tailwind v4</h2>
+    <p>
+      Utility CSS via <code>@tailwindcss/vite</code>. Theme tokens live in
+      <code>src/lib/app.css</code> using <code>@theme</code>; utilities like <code>bg-ground</code>,
+      <code>text-body</code> auto-generate from them. See <a href="styling.html">styling</a>.
+    </p>
 
-<h2>Zod (v4)</h2>
-<p>Single source of truth for shapes. Schemas in <code>src/lib/schemas/</code>; types inferred from them. Used at boundaries: form input, repository reads, action validation in the reducer pipeline. Components also validate their props at render — see <code>TestBox.svelte</code> for the pattern.</p>
+    <h2>Zod (v4)</h2>
+    <p>
+      Single source of truth for shapes. Schemas in <code>src/lib/schemas/</code>; types inferred
+      from them. Used at boundaries: form input, repository reads, action validation in the reducer
+      pipeline. Components also validate their props at render — see <code>TestBox.svelte</code> for
+      the pattern.
+    </p>
 
-<h2>SQLite + Kysely + better-sqlite3</h2>
-<p>One SQLite file, accessed synchronously via <code>better-sqlite3</code> (native bindings), queried through <code>Kysely</code> for typed builders. The connection is opened with <code>journal_mode=WAL</code>, <code>foreign_keys=ON</code>. Schema is managed via Kysely migrations — see <a href="cli.html">CLI</a> and <a href="event-sourcing.html">event sourcing</a>.</p>
+    <h2>SQLite + Kysely + better-sqlite3</h2>
+    <p>
+      One SQLite file, accessed synchronously via <code>better-sqlite3</code> (native bindings),
+      queried through <code>Kysely</code> for typed builders. The connection is opened with
+      <code>journal_mode=WAL</code>, <code>foreign_keys=ON</code>. Schema is managed via Kysely
+      migrations — see <a href="cli.html">CLI</a> and
+      <a href="event-sourcing.html">event sourcing</a>.
+    </p>
 
-<h2>better-auth</h2>
-<p>Passwordless auth with the magic-link plugin. Shares the same SQLite file (and connection) as the rest of the app, so auth tables (<code>user</code>, <code>session</code>, <code>account</code>, <code>verification</code>) live alongside domain tables. See <a href="auth.html">auth</a>.</p>
+    <h2>better-auth</h2>
+    <p>
+      Passwordless auth with the magic-link plugin. Shares the same SQLite file (and connection) as
+      the rest of the app, so auth tables (<code>user</code>, <code>session</code>,
+      <code>account</code>, <code>verification</code>) live alongside domain tables. See
+      <a href="auth.html">auth</a>.
+    </p>
 
-<h2>nodemailer</h2>
-<p>SMTP transport behind a thin wrapper in <code>src/lib/utils/mailer.ts</code>. Dev points at mailpit; prod at a real relay. Only used by the magic-link callback.</p>
+    <h2>nodemailer</h2>
+    <p>
+      SMTP transport behind a thin wrapper in <code>src/lib/utils/mailer.ts</code>. Dev points at
+      mailpit; prod at a real relay. Only used by the magic-link callback.
+    </p>
 
-<h2>Storybook 10</h2>
-<p>Component development sandbox at <code>:6006</code>. Stories live next to components (<code>*.stories.svelte</code>). Storybook imports the same Tailwind <code>app.css</code> the app does, so theming matches. The Vitest addon runs stories as tests automatically.</p>
+    <h2>Storybook 10</h2>
+    <p>
+      Component development sandbox at <code>:6006</code>. Stories live next to components
+      (<code>*.stories.svelte</code>). Storybook imports the same Tailwind <code>app.css</code> the
+      app does, so theming matches. The Vitest addon runs stories as tests automatically.
+    </p>
 
-<h2>Vitest</h2>
-<p>Two projects in one config: <code>*.spec.ts</code> runs in Node (unit / repository tests), <code>*.svelte.spec.ts</code> runs in a real browser via Playwright Chromium (component tests with <code>vitest-browser-svelte</code>). See <a href="testing.html">testing</a>.</p>
+    <h2>Vitest</h2>
+    <p>
+      Two projects in one config: <code>*.spec.ts</code> runs in Node (unit / repository tests),
+      <code>*.svelte.spec.ts</code> runs in a real browser via Playwright Chromium (component tests
+      with <code>vitest-browser-svelte</code>). See <a href="testing.html">testing</a>.
+    </p>
 
-<h2>Docker + Compose + Traefik</h2>
-<p>One <code>docker-compose.yml</code> with <code>dev</code> and <code>prod</code> profiles. Multi-stage <code>Dockerfile</code> produces a slim runtime image (node + sqlite + libstdc++). Traefik handles HTTPS via Let's Encrypt in prod. See <a href="setup-docker.html">Docker setup</a> and <a href="deploy.html">deployment</a>.</p>
+    <h2>Docker + Compose + Traefik</h2>
+    <p>
+      One <code>docker-compose.yml</code> with <code>dev</code> and <code>prod</code> profiles.
+      Multi-stage <code>Dockerfile</code> produces a slim runtime image (node + sqlite + libstdc++).
+      Traefik handles HTTPS via Let's Encrypt in prod. See
+      <a href="setup-docker.html">Docker setup</a> and <a href="deploy.html">deployment</a>.
+    </p>
 
-<h2>citty + esbuild</h2>
-<p><code>citty</code> drives the admin CLI; <code>esbuild</code> bundles it into <code>build/cli.mjs</code> as part of <code>pnpm build</code> so prod doesn't need tsx or pnpm. See <a href="cli.html">CLI</a>.</p>
+    <h2>citty + esbuild</h2>
+    <p>
+      <code>citty</code> drives the admin CLI; <code>esbuild</code> bundles it into
+      <code>build/cli.mjs</code> as part of <code>pnpm build</code> so prod doesn't need tsx or
+      pnpm. See <a href="cli.html">CLI</a>.
+    </p>
 
-<h2>pnpm</h2>
-<p>Package manager. Content-addressed store, strict dep resolution. The Docker build uses <code>corepack</code> in the build stages but the runtime image is plain node — no pnpm at runtime.</p>
-</body>
+    <h2>pnpm</h2>
+    <p>
+      Package manager. Content-addressed store, strict dep resolution. The Docker build uses
+      <code>corepack</code> in the build stages but the runtime image is plain node — no pnpm at
+      runtime.
+    </p>
+  </body>
 </html>

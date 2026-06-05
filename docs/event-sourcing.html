@@ -1,49 +1,91 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<title>Event sourcing · wsid-svelte</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<nav class="top"><a href="index.html">← docs</a></nav>
-<h1>Event sourcing</h1>
-<p class="lede">A <code>Decision</code> is derived state. The source of truth is its ordered log of <code>Action</code>s.</p>
+  <head>
+    <meta charset="utf-8" />
+    <title>Event sourcing · wsid-svelte</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <nav class="top"><a href="index.html">← docs</a></nav>
+    <h1>Event sourcing</h1>
+    <p class="lede">
+      A <code>Decision</code> is derived state. The source of truth is its ordered log of
+      <code>Action</code>s.
+    </p>
 
-<h2>Data model</h2>
-<ul>
-  <li><code>src/lib/schemas/</code> — Zod schemas and inferred types for <code>Decision</code>, <code>Factor</code>, <code>Scenario</code>, <code>DecisionMetadata</code>.</li>
-  <li><code>src/lib/schemas/actions.ts</code> — discriminated union of every <code>Action</code> type (<code>metadata/edit</code>, <code>factor/{add,edit,delete}</code>, <code>scenario/{add,edit,delete}</code>, <code>scenarioFactorValue/set</code>), each carrying a <code>version</code>.</li>
-</ul>
-
-<h2>Reducer</h2>
-<ul>
-  <li><code>src/lib/engine/reducer.ts</code> — <code>reduce(state, action)</code> and <code>replay(actions)</code>.</li>
-  <li>Pure: no IO, no <code>Date.now()</code>, no random. IDs and timestamps come in via the action payload.</li>
-  <li><code>emptyDecision</code> is the initial state.</li>
-</ul>
-
-<h2>Storage</h2>
-<ul>
-  <li><code>src/lib/store/db.ts</code> + <code>schema.ts</code> — SQLite via Kysely. Tables: <code>decisions</code> (id, title) and <code>actions</code> (decision_id, seq, type, version, payload, created_at).</li>
-  <li><code>src/lib/store/decisionRepository.ts</code>:
+    <h2>Data model</h2>
     <ul>
-      <li><code>loadDecision(id)</code> — reads actions ordered by <code>seq</code>, validates each with <code>actionSchema</code>, runs <code>replay</code>.</li>
-      <li><code>createDecision(...)</code> — inserts the <code>decisions</code> row + first <code>metadata/edit</code> action in a transaction.</li>
-      <li><code>appendAction(...)</code> — appends the next-seq action, mirrors title to <code>decisions.title</code> on <code>metadata/edit</code>, retries on PK conflict (bounded by <code>APPEND_ACTION_MAX_RETRIES</code>).</li>
+      <li>
+        <code>src/lib/schemas/</code> — Zod schemas and inferred types for <code>Decision</code>,
+        <code>Factor</code>, <code>Scenario</code>, <code>DecisionMetadata</code>.
+      </li>
+      <li>
+        <code>src/lib/schemas/actions.ts</code> — discriminated union of every
+        <code>Action</code> type (<code>metadata/edit</code>, <code>factor/{add,edit,delete}</code>,
+        <code>scenario/{add,edit,delete}</code>, <code>scenarioFactorValue/set</code>), each
+        carrying a <code>version</code>.
+      </li>
     </ul>
-  </li>
-</ul>
 
-<h2>Flow</h2>
-<p>UI → build <code>Action</code> → <code>appendAction</code> (persist) → on next load, <code>loadDecision</code> replays the log into current state.</p>
+    <h2>Reducer</h2>
+    <ul>
+      <li>
+        <code>src/lib/engine/reducer.ts</code> — <code>reduce(state, action)</code> and
+        <code>replay(actions)</code>.
+      </li>
+      <li>
+        Pure: no IO, no <code>Date.now()</code>, no random. IDs and timestamps come in via the
+        action payload.
+      </li>
+      <li><code>emptyDecision</code> is the initial state.</li>
+    </ul>
 
-<h2>Walkthrough</h2>
-<p>A short story showing the log → reducer → state cycle. Payload shapes are abbreviated for readability; the real ones are in <code>src/lib/schemas/</code>.</p>
+    <h2>Storage</h2>
+    <ul>
+      <li>
+        <code>src/lib/store/db.ts</code> + <code>schema.ts</code> — SQLite via Kysely. Tables:
+        <code>decisions</code> (id, title) and <code>actions</code> (decision_id, seq, type,
+        version, payload, created_at).
+      </li>
+      <li>
+        <code>src/lib/store/decisionRepository.ts</code>:
+        <ul>
+          <li>
+            <code>loadDecision(id)</code> — reads actions ordered by <code>seq</code>, validates
+            each with <code>actionSchema</code>, runs <code>replay</code>.
+          </li>
+          <li>
+            <code>createDecision(...)</code> — inserts the <code>decisions</code> row + first
+            <code>metadata/edit</code> action in a transaction.
+          </li>
+          <li>
+            <code>appendAction(...)</code> — appends the next-seq action, mirrors title to
+            <code>decisions.title</code> on <code>metadata/edit</code>, retries on PK conflict
+            (bounded by <code>APPEND_ACTION_MAX_RETRIES</code>).
+          </li>
+        </ul>
+      </li>
+    </ul>
 
-<h3>1. User creates a decision</h3>
-<p><code>createDecision('d1', 'Where to live?')</code> inserts the <code>decisions</code> row and appends the first action in a single transaction. The log now has one entry; replaying it from <code>emptyDecision</code> gives the initial state.</p>
-<pre><code>// Log
+    <h2>Flow</h2>
+    <p>
+      UI → build <code>Action</code> → <code>appendAction</code> (persist) → on next load,
+      <code>loadDecision</code> replays the log into current state.
+    </p>
+
+    <h2>Walkthrough</h2>
+    <p>
+      A short story showing the log → reducer → state cycle. Payload shapes are abbreviated for
+      readability; the real ones are in <code>src/lib/schemas/</code>.
+    </p>
+
+    <h3>1. User creates a decision</h3>
+    <p>
+      <code>createDecision('d1', 'Where to live?')</code> inserts the <code>decisions</code> row and
+      appends the first action in a single transaction. The log now has one entry; replaying it from
+      <code>emptyDecision</code> gives the initial state.
+    </p>
+    <pre><code>// Log
 [
   { type: 'metadata/edit', version: 1,
     payload: { title: 'Where to live?', description: '' } },
@@ -53,9 +95,14 @@
 { metadata: { title: 'Where to live?', description: '' },
   factors: [], scenarios: [], scenarioFactorValues: {} }</code></pre>
 
-<h3>2. User edits metadata</h3>
-<p>The UI hands an <code>Action</code> to <code>appendAction('d1', …)</code>. Persistence writes the action at the next <code>seq</code> and mirrors the new title onto the <code>decisions</code> row (that mirroring is the one denormalisation in the store — it keeps the listings page fast).</p>
-<pre><code>// New action appended
+    <h3>2. User edits metadata</h3>
+    <p>
+      The UI hands an <code>Action</code> to <code>appendAction('d1', …)</code>. Persistence writes
+      the action at the next <code>seq</code> and mirrors the new title onto the
+      <code>decisions</code> row (that mirroring is the one denormalisation in the store — it keeps
+      the listings page fast).
+    </p>
+    <pre><code>// New action appended
 { type: 'metadata/edit', version: 1,
   payload: { title: 'Where to live?', description: 'Compare SF vs NYC.' } }
 
@@ -63,18 +110,26 @@
 { metadata: { title: 'Where to live?', description: 'Compare SF vs NYC.' },
   factors: [], scenarios: [], scenarioFactorValues: {} }</code></pre>
 
-<h3>3. User adds a factor</h3>
-<p>The route generates an id (UUID) and a timestamp <em>before</em> calling the reducer or the store — the engine never invents either. The action goes into the log; <code>factors</code> grows by one on replay.</p>
-<pre><code>// Appended
+    <h3>3. User adds a factor</h3>
+    <p>
+      The route generates an id (UUID) and a timestamp <em>before</em> calling the reducer or the
+      store — the engine never invents either. The action goes into the log;
+      <code>factors</code> grows by one on replay.
+    </p>
+    <pre><code>// Appended
 { type: 'factor/add', version: 1,
   payload: { id: 'f-cost', name: 'Cost of living', weight: 3 } }
 
 // replay(log).factors
 [ { id: 'f-cost', name: 'Cost of living', weight: 3 } ]</code></pre>
 
-<h3>4. User adds a scenario and sets its value for the factor</h3>
-<p>Two more actions. Note how <code>scenarioFactorValue/set</code> references the prior <code>scenarioId</code> and <code>factorId</code> — the reducer just slots the value into a nested map.</p>
-<pre><code>// Appended
+    <h3>4. User adds a scenario and sets its value for the factor</h3>
+    <p>
+      Two more actions. Note how <code>scenarioFactorValue/set</code> references the prior
+      <code>scenarioId</code> and <code>factorId</code> — the reducer just slots the value into a
+      nested map.
+    </p>
+    <pre><code>// Appended
 { type: 'scenario/add', version: 1, payload: { id: 's-sf', name: 'San Francisco' } }
 { type: 'scenarioFactorValue/set', version: 1,
   payload: { scenarioId: 's-sf', factorId: 'f-cost', value: 2 } }
@@ -85,9 +140,13 @@
   scenarios: [ { id: 's-sf',  name: 'San Francisco' } ],
   scenarioFactorValues: { 's-sf': { 'f-cost': 2 } } }</code></pre>
 
-<h3>5. User deletes the factor</h3>
-<p><code>factor/delete</code> removes the factor <em>and</em> every dependent value across all scenarios — that fan-out is the reducer's job, not the route's. The log keeps the history (the add and the delete both stay); the derived state simply no longer contains the factor.</p>
-<pre><code>// Appended
+    <h3>5. User deletes the factor</h3>
+    <p>
+      <code>factor/delete</code> removes the factor <em>and</em> every dependent value across all
+      scenarios — that fan-out is the reducer's job, not the route's. The log keeps the history (the
+      add and the delete both stay); the derived state simply no longer contains the factor.
+    </p>
+    <pre><code>// Appended
 { type: 'factor/delete', version: 1, payload: { id: 'f-cost' } }
 
 // replay(log) — factor gone, value purged
@@ -96,15 +155,31 @@
   scenarios: [ { id: 's-sf', name: 'San Francisco' } ],
   scenarioFactorValues: { 's-sf': {} } }</code></pre>
 
-<h3>What this buys you</h3>
-<ul>
-  <li><strong>Time travel for free.</strong> Slice the log at any prefix and replay to see prior state.</li>
-  <li><strong>Auditability.</strong> Every change is a typed, versioned action with a timestamp — no UPDATE statements to reconstruct.</li>
-  <li><strong>Pure reducer.</strong> Testing the engine needs no DB and no browser — feed it actions, assert on state.</li>
-  <li><strong>Schema migration is cheap.</strong> Old action payloads can keep their old <code>version</code>; the reducer handles each version explicitly.</li>
-</ul>
+    <h3>What this buys you</h3>
+    <ul>
+      <li>
+        <strong>Time travel for free.</strong> Slice the log at any prefix and replay to see prior
+        state.
+      </li>
+      <li>
+        <strong>Auditability.</strong> Every change is a typed, versioned action with a timestamp —
+        no UPDATE statements to reconstruct.
+      </li>
+      <li>
+        <strong>Pure reducer.</strong> Testing the engine needs no DB and no browser — feed it
+        actions, assert on state.
+      </li>
+      <li>
+        <strong>Schema migration is cheap.</strong> Old action payloads can keep their old
+        <code>version</code>; the reducer handles each version explicitly.
+      </li>
+    </ul>
 
-<h2>Versioning actions</h2>
-<p>Every action type carries an explicit <code>version</code>. When an action's payload shape needs to change, bump the version and teach the reducer to accept both shapes. Old log entries replay unchanged.</p>
-</body>
+    <h2>Versioning actions</h2>
+    <p>
+      Every action type carries an explicit <code>version</code>. When an action's payload shape
+      needs to change, bump the version and teach the reducer to accept both shapes. Old log entries
+      replay unchanged.
+    </p>
+  </body>
 </html>

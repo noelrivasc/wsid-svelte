@@ -17,9 +17,15 @@
   }
 }
 
-html { font-size: 16px; }
+html {
+  font-size: 16px;
+}
 body {
-  font: 16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
+  font:
+    16px/1.55 system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
   color: var(--fg);
   background: var(--bg);
   max-width: 44rem;
@@ -33,16 +39,42 @@ nav.top {
   padding-bottom: 0.75rem;
   border-bottom: 1px solid var(--rule);
 }
-nav.top a { color: var(--muted); }
-h1 { font-size: 1.6rem; margin: 0 0 0.25rem; }
-h2 { font-size: 1.15rem; margin: 2rem 0 0.5rem; }
-h3 { font-size: 1rem; margin: 1.5rem 0 0.25rem; }
-p, ul, ol { margin: 0.6rem 0; }
-ul, ol { padding-left: 1.4rem; }
-li { margin: 0.2rem 0; }
-a { color: var(--link); }
+nav.top a {
+  color: var(--muted);
+}
+h1 {
+  font-size: 1.6rem;
+  margin: 0 0 0.25rem;
+}
+h2 {
+  font-size: 1.15rem;
+  margin: 2rem 0 0.5rem;
+}
+h3 {
+  font-size: 1rem;
+  margin: 1.5rem 0 0.25rem;
+}
+p,
+ul,
+ol {
+  margin: 0.6rem 0;
+}
+ul,
+ol {
+  padding-left: 1.4rem;
+}
+li {
+  margin: 0.2rem 0;
+}
+a {
+  color: var(--link);
+}
 code {
-  font: 0.9em ui-monospace, SFMono-Regular, Menlo, monospace;
+  font:
+    0.9em ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
   background: var(--code-bg);
   padding: 0.05em 0.3em;
   border-radius: 3px;
@@ -55,14 +87,51 @@ pre {
   font-size: 0.85rem;
   line-height: 1.45;
 }
-pre code { background: none; padding: 0; }
-.lede { color: var(--muted); margin-top: 0; }
-.entry { margin: 0.4rem 0 1rem; }
-.entry a { font-weight: 600; }
-.entry .desc { color: var(--muted); display: block; margin-top: 0.1rem; font-size: 0.92rem; }
-table { border-collapse: collapse; font-size: 0.92rem; margin: 0.75rem 0; }
-th, td { text-align: left; padding: 0.35rem 0.8rem 0.35rem 0; vertical-align: top; }
-th { border-bottom: 1px solid var(--rule); }
-hr { border: none; border-top: 1px solid var(--rule); margin: 2rem 0; }
-.mermaid { margin: 1.25rem 0; text-align: center; font-size: 0.85rem; }
-.mermaid svg { max-width: 100%; height: auto; }
+pre code {
+  background: none;
+  padding: 0;
+}
+.lede {
+  color: var(--muted);
+  margin-top: 0;
+}
+.entry {
+  margin: 0.4rem 0 1rem;
+}
+.entry a {
+  font-weight: 600;
+}
+.entry .desc {
+  color: var(--muted);
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 0.92rem;
+}
+table {
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  margin: 0.75rem 0;
+}
+th,
+td {
+  text-align: left;
+  padding: 0.35rem 0.8rem 0.35rem 0;
+  vertical-align: top;
+}
+th {
+  border-bottom: 1px solid var(--rule);
+}
+hr {
+  border: none;
+  border-top: 1px solid var(--rule);
+  margin: 2rem 0;
+}
+.mermaid {
+  margin: 1.25rem 0;
+  text-align: center;
+  font-size: 0.85rem;
+}
+.mermaid svg {
+  max-width: 100%;
+  height: auto;
+}

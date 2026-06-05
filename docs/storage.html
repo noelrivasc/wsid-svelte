@@ -1,52 +1,101 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<title>DB &amp; storage · wsid-svelte</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<nav class="top"><a href="index.html">← docs</a></nav>
-<h1>DB &amp; storage</h1>
-<p class="lede">SQLite via Kysely + better-sqlite3. One file on disk, one repository per entity, migrations bundled at build time.</p>
+  <head>
+    <meta charset="utf-8" />
+    <title>DB &amp; storage · wsid-svelte</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <nav class="top"><a href="index.html">← docs</a></nav>
+    <h1>DB &amp; storage</h1>
+    <p class="lede">
+      SQLite via Kysely + better-sqlite3. One file on disk, one repository per entity, migrations
+      bundled at build time.
+    </p>
 
-<h2>Where it lives</h2>
-<ul>
-  <li>Path comes from <code>DATABASE_PATH</code> (see <a href="env.html">env</a>), defaulting to <code>data/wsid.db</code>.</li>
-  <li>Dev: a host file under <code>data/</code> (gitignored). Delete to start fresh.</li>
-  <li>Docker/prod: a named volume mounted at the container path. See <a href="setup-docker.html">Docker setup</a>.</li>
-</ul>
+    <h2>Where it lives</h2>
+    <ul>
+      <li>
+        Path comes from <code>DATABASE_PATH</code> (see <a href="env.html">env</a>), defaulting to
+        <code>data/wsid.db</code>.
+      </li>
+      <li>Dev: a host file under <code>data/</code> (gitignored). Delete to start fresh.</li>
+      <li>
+        Docker/prod: a named volume mounted at the container path. See
+        <a href="setup-docker.html">Docker setup</a>.
+      </li>
+    </ul>
 
-<h2>How the DB is created</h2>
-<p><code>src/lib/store/db.ts</code> wires it up: <code>createSqlite</code> ensures the parent dir exists, opens the file (WAL, <code>synchronous=NORMAL</code>, <code>foreign_keys=ON</code>), and <code>createDb</code> wraps it in a Kysely instance typed by <code>schema.ts</code>. <code>getConnection()</code> is the lazy singleton used by repositories.</p>
-<p>Schema is defined by migrations — there is no <code>CREATE TABLE</code> at startup. A first run is just "open the file, then migrate."</p>
+    <h2>How the DB is created</h2>
+    <p>
+      <code>src/lib/store/db.ts</code> wires it up: <code>createSqlite</code> ensures the parent dir
+      exists, opens the file (WAL, <code>synchronous=NORMAL</code>, <code>foreign_keys=ON</code>),
+      and <code>createDb</code> wraps it in a Kysely instance typed by <code>schema.ts</code>.
+      <code>getConnection()</code> is the lazy singleton used by repositories.
+    </p>
+    <p>
+      Schema is defined by migrations — there is no <code>CREATE TABLE</code> at startup. A first
+      run is just "open the file, then migrate."
+    </p>
 
-<h2>Migrations</h2>
-<ul>
-  <li>Source files: <code>src/lib/store/migrations/YYYY-MM-DD-&lt;name&gt;.ts</code> with <code>up</code> / <code>down</code>.</li>
-  <li>Registry: <code>src/lib/store/migrations.bundled.ts</code> — manual map, key MUST match the filename stem. Bundled at build so the runtime image doesn't need source files on disk.</li>
-  <li>Runner: <code>src/lib/store/migrator.ts</code>, driven through the CLI.</li>
-</ul>
+    <h2>Migrations</h2>
+    <ul>
+      <li>
+        Source files: <code>src/lib/store/migrations/YYYY-MM-DD-&lt;name&gt;.ts</code> with
+        <code>up</code> / <code>down</code>.
+      </li>
+      <li>
+        Registry: <code>src/lib/store/migrations.bundled.ts</code> — manual map, key MUST match the
+        filename stem. Bundled at build so the runtime image doesn't need source files on disk.
+      </li>
+      <li>Runner: <code>src/lib/store/migrator.ts</code>, driven through the CLI.</li>
+    </ul>
 
-<h3>Running them</h3>
-<table>
-  <tr><th>Command</th><th>What</th></tr>
-  <tr><td><code>pnpm migrate</code></td><td>Apply pending migrations against the host DB (tsx).</td></tr>
-  <tr><td><code>pnpm migrate:docker</code></td><td>Same, but runs the bundled CLI inside the running <code>app</code> container.</td></tr>
-  <tr><td><code>pnpm cli migrate:status</code> / <code>:down</code></td><td>Inspect or roll back. <code>:docker</code> variants exist via <code>pnpm cli:docker</code>.</td></tr>
-</table>
-<p>The container entrypoint also runs <code>migrate</code> on boot, so prod deploys self-apply. See <a href="cli.html">CLI</a> for the full command list.</p>
+    <h3>Running them</h3>
+    <table>
+      <tr>
+        <th>Command</th>
+        <th>What</th>
+      </tr>
+      <tr>
+        <td><code>pnpm migrate</code></td>
+        <td>Apply pending migrations against the host DB (tsx).</td>
+      </tr>
+      <tr>
+        <td><code>pnpm migrate:docker</code></td>
+        <td>Same, but runs the bundled CLI inside the running <code>app</code> container.</td>
+      </tr>
+      <tr>
+        <td><code>pnpm cli migrate:status</code> / <code>:down</code></td>
+        <td>
+          Inspect or roll back. <code>:docker</code> variants exist via
+          <code>pnpm cli:docker</code>.
+        </td>
+      </tr>
+    </table>
+    <p>
+      The container entrypoint also runs <code>migrate</code> on boot, so prod deploys self-apply.
+      See <a href="cli.html">CLI</a> for the full command list.
+    </p>
 
-<h2>Repositories</h2>
-<p>One file per entity under <code>src/lib/store/</code> (e.g. <code>decisionRepository.ts</code>, <code>userRepository.ts</code>). They expose named functions (<code>loadX</code>, <code>createX</code>, <code>appendY</code>) and own all SQL/Kysely calls. Routes and the engine never touch <code>db.ts</code> or write SQL directly.</p>
+    <h2>Repositories</h2>
+    <p>
+      One file per entity under <code>src/lib/store/</code> (e.g.
+      <code>decisionRepository.ts</code>, <code>userRepository.ts</code>). They expose named
+      functions (<code>loadX</code>, <code>createX</code>, <code>appendY</code>) and own all
+      SQL/Kysely calls. Routes and the engine never touch <code>db.ts</code> or write SQL directly.
+    </p>
 
-<h2>Import rules</h2>
-<ul>
-  <li><strong>engine → store</strong>: forbidden. Engine is pure; storage stays out.</li>
-  <li><strong>store → engine</strong>: forbidden. Persistence shouldn't know domain rules.</li>
-  <li><strong>both → schemas</strong>: fine; <code>schemas/</code> is the shared contract.</li>
-  <li><strong>routes → store</strong>: only via a repository, never <code>store/db</code> directly.</li>
-</ul>
-<p>More in <a href="layout.html">code layout</a>.</p>
-</body>
+    <h2>Import rules</h2>
+    <ul>
+      <li><strong>engine → store</strong>: forbidden. Engine is pure; storage stays out.</li>
+      <li><strong>store → engine</strong>: forbidden. Persistence shouldn't know domain rules.</li>
+      <li><strong>both → schemas</strong>: fine; <code>schemas/</code> is the shared contract.</li>
+      <li>
+        <strong>routes → store</strong>: only via a repository, never
+        <code>store/db</code> directly.
+      </li>
+    </ul>
+    <p>More in <a href="layout.html">code layout</a>.</p>
+  </body>
 </html>

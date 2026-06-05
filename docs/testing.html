@@ -1,44 +1,82 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<title>Testing · wsid-svelte</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<nav class="top"><a href="index.html">← docs</a></nav>
-<h1>Testing</h1>
-<p class="lede">Two vitest projects share one config. Filename suffix decides where a test runs.</p>
+  <head>
+    <meta charset="utf-8" />
+    <title>Testing · wsid-svelte</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <nav class="top"><a href="index.html">← docs</a></nav>
+    <h1>Testing</h1>
+    <p class="lede">
+      Two vitest projects share one config. Filename suffix decides where a test runs.
+    </p>
 
-<h2>Projects</h2>
-<table>
-  <tr><th>Suffix</th><th>Runtime</th><th>Use for</th></tr>
-  <tr><td><code>*.spec.ts</code></td><td>Node</td><td>Pure functions (engine, schemas), repository tests against an in-memory SQLite.</td></tr>
-  <tr><td><code>*.svelte.spec.ts</code></td><td>Browser (Playwright Chromium, via <code>vitest-browser-svelte</code>)</td><td>Component tests with real DOM and locators.</td></tr>
-</table>
-<p>Configured in <code>vite.config.ts</code>. Component-test locators are async — <code>await expect.element(...)</code>.</p>
+    <h2>Projects</h2>
+    <table>
+      <tr>
+        <th>Suffix</th>
+        <th>Runtime</th>
+        <th>Use for</th>
+      </tr>
+      <tr>
+        <td><code>*.spec.ts</code></td>
+        <td>Node</td>
+        <td>Pure functions (engine, schemas), repository tests against an in-memory SQLite.</td>
+      </tr>
+      <tr>
+        <td><code>*.svelte.spec.ts</code></td>
+        <td>Browser (Playwright Chromium, via <code>vitest-browser-svelte</code>)</td>
+        <td>Component tests with real DOM and locators.</td>
+      </tr>
+    </table>
+    <p>
+      Configured in <code>vite.config.ts</code>. Component-test locators are async —
+      <code>await expect.element(...)</code>.
+    </p>
 
-<h2>Running</h2>
-<pre><code>pnpm test           # both projects, single run
+    <h2>Running</h2>
+    <pre><code>pnpm test           # both projects, single run
 pnpm test:unit      # watch mode</code></pre>
-<p>First run on a fresh checkout needs <code>pnpm exec playwright install chromium</code>.</p>
+    <p>First run on a fresh checkout needs <code>pnpm exec playwright install chromium</code>.</p>
 
-<h2>Storybook integration</h2>
-<p>The Storybook addon-vitest auto-runs every <code>*.stories.svelte</code> as a smoke test (mounts the story, asserts no render error). Stories live next to their component.</p>
+    <h2>Storybook integration</h2>
+    <p>
+      The Storybook addon-vitest auto-runs every <code>*.stories.svelte</code> as a smoke test
+      (mounts the story, asserts no render error). Stories live next to their component.
+    </p>
 
-<h2>Where tests live</h2>
-<ul>
-  <li><strong>Repositories</strong>: <code>src/lib/store/<em>EntityRepository</em>.spec.ts</code>. Use the in-memory DB helper to spawn a fresh sqlite per test.</li>
-  <li><strong>Engine</strong>: alongside the function under test, <code>src/lib/engine/<em>name</em>.spec.ts</code>.</li>
-  <li><strong>Components</strong>: next to the component, <code>src/lib/components/<em>path</em>/<em>Name</em>.svelte.spec.ts</code>.</li>
-  <li><strong>Test data</strong>: <code>src/lib/test_data/</code> — fixtures matching the Zod schemas. Used by tests, stories, and seed scripts. Never imported by production code.</li>
-</ul>
+    <h2>Where tests live</h2>
+    <ul>
+      <li>
+        <strong>Repositories</strong>: <code>src/lib/store/<em>EntityRepository</em>.spec.ts</code>.
+        Use the in-memory DB helper to spawn a fresh sqlite per test.
+      </li>
+      <li>
+        <strong>Engine</strong>: alongside the function under test,
+        <code>src/lib/engine/<em>name</em>.spec.ts</code>.
+      </li>
+      <li>
+        <strong>Components</strong>: next to the component,
+        <code>src/lib/components/<em>path</em>/<em>Name</em>.svelte.spec.ts</code>.
+      </li>
+      <li>
+        <strong>Test data</strong>: <code>src/lib/test_data/</code> — fixtures matching the Zod
+        schemas. Used by tests, stories, and seed scripts. Never imported by production code.
+      </li>
+    </ul>
 
-<h2>What to test</h2>
-<ul>
-  <li>Engine reducer branches and the schema↔reducer contract.</li>
-  <li>Repository behaviours that go beyond "Kysely works" — transactions, retries, mirrored writes.</li>
-  <li>Component <em>contracts</em>: that valid props render the happy path and invalid props surface the Zod error UI. Don't re-test Zod itself.</li>
-</ul>
-</body>
+    <h2>What to test</h2>
+    <ul>
+      <li>Engine reducer branches and the schema↔reducer contract.</li>
+      <li>
+        Repository behaviours that go beyond "Kysely works" — transactions, retries, mirrored
+        writes.
+      </li>
+      <li>
+        Component <em>contracts</em>: that valid props render the happy path and invalid props
+        surface the Zod error UI. Don't re-test Zod itself.
+      </li>
+    </ul>
+  </body>
 </html>

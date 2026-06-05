@@ -1,5 +1,5 @@
 @import 'tailwindcss';
-@source "../../node_modules/flowbite-svelte/dist";
+@source '../../node_modules/flowbite-svelte/dist';
 
 @layer base {
   body {
@@ -34,9 +34,7 @@
   --font-serif: Merriweather, serif;
   --font-sans: 'Merriweather Sans', system-ui, sans-serif;
   --font-sans-weight: 100;
-  --font-mono: Consolas, Menlo, Monaco,
-    /* full stack from fonts.css */
-  ;
+  --font-mono: Consolas, Menlo, Monaco, /* full stack from fonts.css */;
 
   /* Solarized Base Colors */
   --color-base03: var(--base03);

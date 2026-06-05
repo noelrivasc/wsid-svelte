@@ -1,11 +1,11 @@
 services:
   traefik:
     image: traefik:v3.5
-    profiles: ["prod"]
+    profiles: ['prod']
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
+      - '80:80'
+      - '443:443'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./docker/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
@@ -19,28 +19,28 @@ services:
     env_file:
       - .env
     ports:
-      - "127.0.0.1:3000:3000"
+      - '127.0.0.1:3000:3000'
     volumes:
       - ./data:/app/data
     networks:
       - web
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.app.rule=Host(`wsid.noelr.dev`)"
-      - "traefik.http.routers.app.entrypoints=websecure"
-      - "traefik.http.routers.app.tls.certresolver=letsencrypt"
-      - "traefik.http.services.app.loadbalancer.server.port=3000"
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.app.rule=Host(`wsid.noelr.dev`)'
+      - 'traefik.http.routers.app.entrypoints=websecure'
+      - 'traefik.http.routers.app.tls.certresolver=letsencrypt'
+      - 'traefik.http.services.app.loadbalancer.server.port=3000'
 
   # Local SMTP catcher for the magic-link auth flow.
   # Started as part of the `dev` profile: `docker compose --profile dev up`.
   # SMTP (from app container): mailpit:1025  |  Web UI: http://localhost:8025
   mailpit:
     image: axllent/mailpit:latest
-    profiles: ["dev"]
+    profiles: ['dev']
     restart: unless-stopped
     ports:
-      - "127.0.0.1:1125:1025"
-      - "127.0.0.1:8125:8025"
+      - '127.0.0.1:1125:1025'
+      - '127.0.0.1:8125:8025'
     networks:
       - web
 

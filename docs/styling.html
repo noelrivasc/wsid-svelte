@@ -1,42 +1,99 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<title>Styling · wsid-svelte</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<nav class="top"><a href="index.html">← docs</a></nav>
-<h1>Styling &amp; theming</h1>
-<p class="lede">Tailwind v4 utilities, generated from <code>@theme</code> tokens. One CSS entry, shared between the app and Storybook.</p>
+  <head>
+    <meta charset="utf-8" />
+    <title>Styling · wsid-svelte</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <nav class="top"><a href="index.html">← docs</a></nav>
+    <h1>Styling &amp; theming</h1>
+    <p class="lede">
+      Tailwind v4 utilities, generated from <code>@theme</code> tokens. One CSS entry, shared
+      between the app and Storybook.
+    </p>
 
-<h2>Entry point</h2>
-<p><code>src/lib/app.css</code> imports Tailwind and declares the Solarized palette via <code>@theme</code>. Tailwind auto-generates utilities from every <code>--color-*</code> token.</p>
+    <h2>Entry point</h2>
+    <p>
+      <code>src/lib/app.css</code> imports Tailwind and declares the Solarized palette via
+      <code>@theme</code>. Tailwind auto-generates utilities from every
+      <code>--color-*</code> token.
+    </p>
 
-<h3>Token families</h3>
-<table>
-  <tr><th>Prefix</th><th>Examples</th><th>Purpose</th></tr>
-  <tr><td><code>--color-c01</code> … <code>--color-c07</code></td><td><code>bg-c01</code>, <code>border-c03</code>, <code>text-c06</code></td><td>Contrast scale, dark-mode aware. <code>c01</code> = near-ground, <code>c07</code> = near-body.</td></tr>
-  <tr><td><code>--color-base*</code></td><td><code>bg-base02</code>, <code>text-base1</code></td><td>Raw Solarized base palette. Prefer the contrast scale unless you need a specific base.</td></tr>
-  <tr><td><code>--color-accent-*</code></td><td><code>bg-accent-red</code>, <code>text-accent-blue</code></td><td>Solarized accents. Prefixed so Tailwind's default <code>red-*</code>/<code>blue-*</code> scales remain available.</td></tr>
-  <tr><td>semantic</td><td><code>bg-ground</code>, <code>text-body</code>, <code>text-heading</code>, <code>bg-cta</code></td><td>Role-based aliases — what you reach for first.</td></tr>
-</table>
-<p>This single file is imported by:</p>
-<ul>
-  <li><code>src/routes/+layout.svelte</code> — the SvelteKit shell.</li>
-  <li><code>.storybook/preview.ts</code> — so stories render with the same theme as the app.</li>
-</ul>
+    <h3>Token families</h3>
+    <table>
+      <tr>
+        <th>Prefix</th>
+        <th>Examples</th>
+        <th>Purpose</th>
+      </tr>
+      <tr>
+        <td><code>--color-c01</code> … <code>--color-c07</code></td>
+        <td><code>bg-c01</code>, <code>border-c03</code>, <code>text-c06</code></td>
+        <td>
+          Contrast scale, dark-mode aware. <code>c01</code> = near-ground, <code>c07</code> =
+          near-body.
+        </td>
+      </tr>
+      <tr>
+        <td><code>--color-base*</code></td>
+        <td><code>bg-base02</code>, <code>text-base1</code></td>
+        <td>
+          Raw Solarized base palette. Prefer the contrast scale unless you need a specific base.
+        </td>
+      </tr>
+      <tr>
+        <td><code>--color-accent-*</code></td>
+        <td><code>bg-accent-red</code>, <code>text-accent-blue</code></td>
+        <td>
+          Solarized accents. Prefixed so Tailwind's default <code>red-*</code>/<code>blue-*</code>
+          scales remain available.
+        </td>
+      </tr>
+      <tr>
+        <td>semantic</td>
+        <td>
+          <code>bg-ground</code>, <code>text-body</code>, <code>text-heading</code>,
+          <code>bg-cta</code>
+        </td>
+        <td>Role-based aliases — what you reach for first.</td>
+      </tr>
+    </table>
+    <p>This single file is imported by:</p>
+    <ul>
+      <li><code>src/routes/+layout.svelte</code> — the SvelteKit shell.</li>
+      <li>
+        <code>.storybook/preview.ts</code> — so stories render with the same theme as the app.
+      </li>
+    </ul>
 
-<h2>Body styling</h2>
-<p>Lives inside <code>app.css</code> in <code>@layer base</code>, not in <code>app.html</code>. That way both contexts (SvelteKit and Storybook) pick it up via the CSS import.</p>
+    <h2>Body styling</h2>
+    <p>
+      Lives inside <code>app.css</code> in <code>@layer base</code>, not in <code>app.html</code>.
+      That way both contexts (SvelteKit and Storybook) pick it up via the CSS import.
+    </p>
 
-<h2>Dark mode</h2>
-<p>Tokens are rewritten on <code>:root</code> under <code>@media (prefers-color-scheme: dark)</code>. Utilities like <code>bg-ground</code> automatically flip because they reference the token.</p>
+    <h2>Dark mode</h2>
+    <p>
+      Tokens are rewritten on <code>:root</code> under
+      <code>@media (prefers-color-scheme: dark)</code>. Utilities like
+      <code>bg-ground</code> automatically flip because they reference the token.
+    </p>
 
-<h2>Reach for semantic tokens first</h2>
-<p>Prefer <code>bg-ground</code>, <code>text-body</code>, <code>text-heading</code>, <code>bg-cta</code>, and the <code>c01</code>–<code>c07</code> contrast scale over raw base or accent colors. They carry intent and flip correctly in dark mode without you having to think about it.</p>
+    <h2>Reach for semantic tokens first</h2>
+    <p>
+      Prefer <code>bg-ground</code>, <code>text-body</code>, <code>text-heading</code>,
+      <code>bg-cta</code>, and the <code>c01</code>–<code>c07</code> contrast scale over raw base or
+      accent colors. They carry intent and flip correctly in dark mode without you having to think
+      about it.
+    </p>
 
-<h2>Flowbite components</h2>
-<p>Theme by passing Tailwind utilities via <code>class=</code> (using project tokens like <code>bg-cta</code>, <code>bg-accent-red</code>, <code>border-c03</code>, <code>focus:ring-c01</code>). Don't reach for Flowbite's <code>color</code> prop or wrap components just to retheme them.</p>
-</body>
+    <h2>Flowbite components</h2>
+    <p>
+      Theme by passing Tailwind utilities via <code>class=</code> (using project tokens like
+      <code>bg-cta</code>, <code>bg-accent-red</code>, <code>border-c03</code>,
+      <code>focus:ring-c01</code>). Don't reach for Flowbite's <code>color</code> prop or wrap
+      components just to retheme them.
+    </p>
+  </body>
 </html>

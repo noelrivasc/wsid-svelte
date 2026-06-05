@@ -1,22 +1,40 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<title>Storybook-compatible forms · wsid-svelte</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<nav class="top"><a href="index.html">← docs</a></nav>
-<h1>Storybook-compatible forms</h1>
-<p class="lede">How a form that posts to a SvelteKit action still renders and behaves in Storybook, where no action exists.</p>
+  <head>
+    <meta charset="utf-8" />
+    <title>Storybook-compatible forms · wsid-svelte</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <nav class="top"><a href="index.html">← docs</a></nav>
+    <h1>Storybook-compatible forms</h1>
+    <p class="lede">
+      How a form that posts to a SvelteKit action still renders and behaves in Storybook, where no
+      action exists.
+    </p>
 
-<h2>The problem</h2>
-<p>A SvelteKit form uses <code>use:enhance</code> to POST to a server action (<code>?/addFactor</code>). Storybook has no server, no action, and no <code>+page.server.ts</code> — so a real submission would 404 or hang. But we still want the form in Storybook to exercise the submit path (validation gating the button, the success flow) and to surface the submitted payload in the Actions panel. The fix is an optional <code>mockSubmit</code> prop that intercepts and cancels the network call when present.</p>
-<p>Reference implementation: <code>src/lib/components/factors/FactorForm.svelte</code> and its wrappers. The same shape is used by the scenario forms.</p>
+    <h2>The problem</h2>
+    <p>
+      A SvelteKit form uses <code>use:enhance</code> to POST to a server action
+      (<code>?/addFactor</code>). Storybook has no server, no action, and no
+      <code>+page.server.ts</code> — so a real submission would 404 or hang. But we still want the
+      form in Storybook to exercise the submit path (validation gating the button, the success flow)
+      and to surface the submitted payload in the Actions panel. The fix is an optional
+      <code>mockSubmit</code> prop that intercepts and cancels the network call when present.
+    </p>
+    <p>
+      Reference implementation: <code>src/lib/components/factors/FactorForm.svelte</code> and its
+      wrappers. The same shape is used by the scenario forms.
+    </p>
 
-<h2>The interceptor</h2>
-<p>Every form component defines its <code>use:enhance</code> handler as a <code>SubmitFunction</code> that branches on the prop. If <code>mockSubmit</code> is provided, hand it the form data, <code>cancel()</code> the request, and stop. Otherwise return the normal enhance callback that lets the real action run.</p>
-<pre><code>// FactorForm.svelte
+    <h2>The interceptor</h2>
+    <p>
+      Every form component defines its <code>use:enhance</code> handler as a
+      <code>SubmitFunction</code> that branches on the prop. If <code>mockSubmit</code> is provided,
+      hand it the form data, <code>cancel()</code> the request, and stop. Otherwise return the
+      normal enhance callback that lets the real action run.
+    </p>
+    <pre><code>// FactorForm.svelte
 type Props = {
   action: string;
   submitLabel: string;
@@ -38,33 +56,75 @@ const submit: SubmitFunction = ({ formData, cancel }) =&gt; {
     if (result.type === 'success') onSuccess?.();
   };
 };</code></pre>
-<pre><code>&lt;form method="POST" {action} use:enhance={submit} ...&gt;</code></pre>
-<p>Key points:</p>
-<ul>
-  <li><code>mockSubmit</code> is optional. Omitting it (the app) is the production path; providing it (Storybook) is the mock path. No environment sniffing.</li>
-  <li><code>cancel()</code> aborts the actual POST, so Storybook never touches a non-existent action.</li>
-  <li>The signature is <code>(data: Record&lt;string, FormDataEntryValue&gt;) =&gt; void</code> — a plain object built from <code>Object.fromEntries(formData)</code>, so the Actions panel shows readable field values.</li>
-  <li>The real branch returns the enhance callback and fires <code>onSuccess</code> only on <code>result.type === 'success'</code> (the action returns <code>fail(400, ...)</code> on a Zod miss).</li>
-</ul>
+    <pre><code>&lt;form method="POST" {action} use:enhance={submit} ...&gt;</code></pre>
+    <p>Key points:</p>
+    <ul>
+      <li>
+        <code>mockSubmit</code> is optional. Omitting it (the app) is the production path; providing
+        it (Storybook) is the mock path. No environment sniffing.
+      </li>
+      <li>
+        <code>cancel()</code> aborts the actual POST, so Storybook never touches a non-existent
+        action.
+      </li>
+      <li>
+        The signature is <code>(data: Record&lt;string, FormDataEntryValue&gt;) =&gt; void</code> —
+        a plain object built from <code>Object.fromEntries(formData)</code>, so the Actions panel
+        shows readable field values.
+      </li>
+      <li>
+        The real branch returns the enhance callback and fires <code>onSuccess</code> only on
+        <code>result.type === 'success'</code> (the action returns <code>fail(400, ...)</code> on a
+        Zod miss).
+      </li>
+    </ul>
 
-<h2>Threading through wrappers</h2>
-<p><code>FactorForm</code> is an implementation detail; call sites use the <code>FactorFormAdd</code> / <code>FactorFormEdit</code> wrappers, which fix the <code>action</code> and <code>submitLabel</code> and pass <code>mockSubmit</code> straight through.</p>
-<pre><code>// FactorFormAdd.svelte
+    <h2>Threading through wrappers</h2>
+    <p>
+      <code>FactorForm</code> is an implementation detail; call sites use the
+      <code>FactorFormAdd</code> / <code>FactorFormEdit</code> wrappers, which fix the
+      <code>action</code> and <code>submitLabel</code> and pass <code>mockSubmit</code> straight
+      through.
+    </p>
+    <pre><code>// FactorFormAdd.svelte
 let { onCancel, onSuccess, mockSubmit }: Props = $props();
 
 &lt;FactorForm action="?/addFactor" submitLabel="Add" {onCancel} {onSuccess} {mockSubmit} /&gt;</code></pre>
-<p>Each form is its own component with a single action and a single <code>mockSubmit</code>. Add, edit, and delete are separate components (<code>FactorFormAdd</code>, <code>FactorFormEdit</code>, <code>FactorFormDelete</code>) rather than one form juggling several submit paths.</p>
+    <p>
+      Each form is its own component with a single action and a single <code>mockSubmit</code>. Add,
+      edit, and delete are separate components (<code>FactorFormAdd</code>,
+      <code>FactorFormEdit</code>, <code>FactorFormDelete</code>) rather than one form juggling
+      several submit paths.
+    </p>
 
-<h2>The three call sites</h2>
-<table>
-  <thead><tr><th>Context</th><th>Passes <code>mockSubmit</code>?</th><th>Result</th></tr></thead>
-  <tbody>
-    <tr><td>Route (<code>+page.svelte</code>)</td><td>no</td><td>real action runs; <code>onSuccess</code> closes the dialog</td></tr>
-    <tr><td>Story (<code>.stories.svelte</code>)</td><td>yes — <code>fn()</code></td><td>POST cancelled; payload logged to Actions panel</td></tr>
-    <tr><td>Spec (<code>*.svelte.spec.ts</code>)</td><td>yes — a spy</td><td>assert the interceptor received the expected field values</td></tr>
-  </tbody>
-</table>
-<pre><code>// FactorForm.stories.svelte
+    <h2>The three call sites</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Context</th>
+          <th>Passes <code>mockSubmit</code>?</th>
+          <th>Result</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Route (<code>+page.svelte</code>)</td>
+          <td>no</td>
+          <td>real action runs; <code>onSuccess</code> closes the dialog</td>
+        </tr>
+        <tr>
+          <td>Story (<code>.stories.svelte</code>)</td>
+          <td>yes — <code>fn()</code></td>
+          <td>POST cancelled; payload logged to Actions panel</td>
+        </tr>
+        <tr>
+          <td>Spec (<code>*.svelte.spec.ts</code>)</td>
+          <td>yes — a spy</td>
+          <td>assert the interceptor received the expected field values</td>
+        </tr>
+      </tbody>
+    </table>
+    <pre><code>// FactorForm.stories.svelte
 import { fn } from 'storybook/test';
 
 &lt;Story name="FactorFormAdd"&gt;
@@ -74,25 +134,64 @@ import { fn } from 'storybook/test';
 &lt;Story name="FactorFormEdit"&gt;
   &lt;FactorFormEdit factor={formSampleFactor} mockSubmit={fn()} onCancel={fn()} /&gt;
 &lt;/Story&gt;</code></pre>
-<p>In the route, the same wrappers are mounted without <code>mockSubmit</code>, so <code>use:enhance</code> posts to the real action and <code>onSuccess</code> runs the close handler.</p>
+    <p>
+      In the route, the same wrappers are mounted without <code>mockSubmit</code>, so
+      <code>use:enhance</code> posts to the real action and <code>onSuccess</code> runs the close
+      handler.
+    </p>
 
-<h2>Replicating the pattern (checklist for a new form)</h2>
-<ol>
-  <li>Add an optional <code>mockSubmit?: (data: Record&lt;string, FormDataEntryValue&gt;) =&gt; void</code> to the component's <code>Props</code>.</li>
-  <li>Write the <code>use:enhance</code> handler as a <code>SubmitFunction</code> that branches: <code>mockSubmit</code> → call it, <code>cancel()</code>, return; otherwise return the real enhance callback.</li>
-  <li>Keep one action per form component (separate add / edit / delete components), each with a single <code>mockSubmit</code> and its own <code>SubmitFunction</code>.</li>
-  <li>Thread the mock prop through any wrapper component unchanged.</li>
-  <li>In every story, pass the mock prop as <code>fn()</code> from <code>storybook/test</code>. Never let a story hit a real action.</li>
-  <li>In routes, omit the mock prop — that is the production path.</li>
-</ol>
-<p><strong>Do not</strong> ship a form whose only submit path is a bare <code>use:enhance</code> POST with no <code>mockSubmit</code> escape hatch — it will fail or hang in Storybook and break the story-as-smoke-test in Vitest. This is the form-action exception to the "props in, callbacks out" rule in <a href="storybook.html">storybook</a>: forms are allowed a real action <em>because</em> the mock prop keeps them portable.</p>
-<p><small>Known exception: <code>Navbar.svelte</code>'s sign-out form (<a href="https://github.com/noelrivasc/wsid-svelte/issues/14">#14</a>).</small></p>
+    <h2>Replicating the pattern (checklist for a new form)</h2>
+    <ol>
+      <li>
+        Add an optional
+        <code>mockSubmit?: (data: Record&lt;string, FormDataEntryValue&gt;) =&gt; void</code> to the
+        component's <code>Props</code>.
+      </li>
+      <li>
+        Write the <code>use:enhance</code> handler as a <code>SubmitFunction</code> that branches:
+        <code>mockSubmit</code> → call it, <code>cancel()</code>, return; otherwise return the real
+        enhance callback.
+      </li>
+      <li>
+        Keep one action per form component (separate add / edit / delete components), each with a
+        single <code>mockSubmit</code> and its own <code>SubmitFunction</code>.
+      </li>
+      <li>Thread the mock prop through any wrapper component unchanged.</li>
+      <li>
+        In every story, pass the mock prop as <code>fn()</code> from <code>storybook/test</code>.
+        Never let a story hit a real action.
+      </li>
+      <li>In routes, omit the mock prop — that is the production path.</li>
+    </ol>
+    <p>
+      <strong>Do not</strong> ship a form whose only submit path is a bare
+      <code>use:enhance</code> POST with no <code>mockSubmit</code> escape hatch — it will fail or
+      hang in Storybook and break the story-as-smoke-test in Vitest. This is the form-action
+      exception to the "props in, callbacks out" rule in <a href="storybook.html">storybook</a>:
+      forms are allowed a real action <em>because</em> the mock prop keeps them portable.
+    </p>
+    <p>
+      <small
+        >Known exception: <code>Navbar.svelte</code>'s sign-out form (<a
+          href="https://github.com/noelrivasc/wsid-svelte/issues/14"
+          >#14</a
+        >).</small
+      >
+    </p>
 
-<h2>See also</h2>
-<ul>
-  <li><a href="storybook.html">Storybook</a> — making components render in both runtimes; story format.</li>
-  <li><a href="testing.html">Testing</a> — stories-as-tests and where behavioural specs live.</li>
-  <li><a href="event-sourcing.html">Event sourcing</a> — what the real <code>addFactor</code>/<code>editFactor</code>/<code>deleteFactor</code> actions append.</li>
-</ul>
-</body>
+    <h2>See also</h2>
+    <ul>
+      <li>
+        <a href="storybook.html">Storybook</a> — making components render in both runtimes; story
+        format.
+      </li>
+      <li>
+        <a href="testing.html">Testing</a> — stories-as-tests and where behavioural specs live.
+      </li>
+      <li>
+        <a href="event-sourcing.html">Event sourcing</a> — what the real
+        <code>addFactor</code>/<code>editFactor</code>/<code>deleteFactor</code> actions append.
+      </li>
+    </ul>
+  </body>
 </html>

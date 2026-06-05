@@ -11,13 +11,13 @@ import * as m20260604DecisionUser from './migrations/2026-06-04-decision-user';
 
 const migrations: Record<string, Migration> = {
   '2026-05-25-initial-state': m20260525InitialState,
-  '2026-06-04-decision-user': m20260604DecisionUser,
+  '2026-06-04-decision-user': m20260604DecisionUser
 };
 
 export const bundledMigrationProvider: MigrationProvider = {
   async getMigrations() {
     return migrations;
-  },
+  }
 };
 
 export const bundledMigrationNames = Object.keys(migrations);

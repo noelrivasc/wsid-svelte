@@ -28,9 +28,7 @@ export const actions: Actions = {
 
     const redirectTo = url.searchParams.get('redirectTo');
     const safeRedirect =
-      redirectTo && redirectTo.startsWith('/') && !redirectTo.startsWith('//')
-        ? redirectTo
-        : '/';
+      redirectTo && redirectTo.startsWith('/') && !redirectTo.startsWith('//') ? redirectTo : '/';
     throw redirect(303, safeRedirect);
   }
 };

@@ -1,12 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import { loadActions, appendAction, OwnershipError } from '$lib/store/decisionRepository';
 import { hydrate } from '$lib/engine/reducer';
-import {
-  decisionMetadataSchema,
-  factorSchema,
-  scenarioSchema,
-  type Action
-} from '$lib/schemas';
+import { decisionMetadataSchema, factorSchema, scenarioSchema, type Action } from '$lib/schemas';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { z } from 'zod';
 

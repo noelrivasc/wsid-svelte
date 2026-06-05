@@ -1,50 +1,114 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<title>wsid-svelte docs</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<h1>wsid-svelte docs</h1>
-<p class="lede">A map of the project. Each page is short on purpose; the code carries the rest.</p>
+  <head>
+    <meta charset="utf-8" />
+    <title>wsid-svelte docs</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>wsid-svelte docs</h1>
+    <p class="lede">
+      A map of the project. Each page is short on purpose; the code carries the rest.
+    </p>
 
-<h2>Getting set up</h2>
-<div class="entry"><a href="setup-dev.html">Dev setup (Vite)</a>
-  <span class="desc">Bare <code>pnpm dev</code> loop for fast iteration against a host SQLite file.</span></div>
-<div class="entry"><a href="setup-docker.html">Docker setup</a>
-  <span class="desc">Prod-matching local stack and the bridge to production deploys.</span></div>
-<div class="entry"><a href="env.html">Environment variables</a>
-  <span class="desc">Every variable read by <code>getConfig</code>, with defaults and required-ness.</span></div>
+    <h2>Getting set up</h2>
+    <div class="entry">
+      <a href="setup-dev.html">Dev setup (Vite)</a>
+      <span class="desc"
+        >Bare <code>pnpm dev</code> loop for fast iteration against a host SQLite file.</span
+      >
+    </div>
+    <div class="entry">
+      <a href="setup-docker.html">Docker setup</a>
+      <span class="desc">Prod-matching local stack and the bridge to production deploys.</span>
+    </div>
+    <div class="entry">
+      <a href="env.html">Environment variables</a>
+      <span class="desc"
+        >Every variable read by <code>getConfig</code>, with defaults and required-ness.</span
+      >
+    </div>
 
-<h2>How the app is built</h2>
-<div class="entry"><a href="stack.html">Stack</a>
-  <span class="desc">What each tool does and why it's in the tree (SvelteKit, Vite, Tailwind, Zod, Kysely, SQLite, better-auth, Storybook, Vitest).</span></div>
-<div class="entry"><a href="layout.html">Code layout &amp; conventions</a>
-  <span class="desc">Where things go. Each concern has one predictable home; routes are thin glue.</span></div>
-<div class="entry"><a href="storage.html">DB &amp; storage</a>
-  <span class="desc">SQLite + Kysely, bundled migrations, one repository per entity, import rules between store and engine.</span></div>
-<div class="entry"><a href="event-sourcing.html">Event sourcing</a>
-  <span class="desc">How a <code>Decision</code> is derived by replaying its action log.</span></div>
-<div class="entry"><a href="auth.html">Auth</a>
-  <span class="desc">Magic-link auth via better-auth: routes, session, mailer, GET-then-POST flow.</span></div>
-<div class="entry"><a href="styling.html">Styling &amp; theming</a>
-  <span class="desc">Tailwind v4 <code>@theme</code> tokens, Solarized palette, shared CSS between app and Storybook.</span></div>
-<div class="entry"><a href="storybook.html">Storybook</a>
-  <span class="desc">Component sandbox, story format, and the patterns that keep components renderable in both SvelteKit and Storybook.</span></div>
-<div class="entry"><a href="form-mocking.html">Storybook-compatible forms</a>
-  <span class="desc">The <code>mockSubmit</code> prop that lets a form post to a real SvelteKit action in the app but intercept and cancel it in Storybook.</span></div>
-<div class="entry"><a href="testing.html">Testing</a>
-  <span class="desc">Two vitest projects (Node + browser), Storybook integration, where tests live.</span></div>
+    <h2>How the app is built</h2>
+    <div class="entry">
+      <a href="stack.html">Stack</a>
+      <span class="desc"
+        >What each tool does and why it's in the tree (SvelteKit, Vite, Tailwind, Zod, Kysely,
+        SQLite, better-auth, Storybook, Vitest).</span
+      >
+    </div>
+    <div class="entry">
+      <a href="layout.html">Code layout &amp; conventions</a>
+      <span class="desc"
+        >Where things go. Each concern has one predictable home; routes are thin glue.</span
+      >
+    </div>
+    <div class="entry">
+      <a href="storage.html">DB &amp; storage</a>
+      <span class="desc"
+        >SQLite + Kysely, bundled migrations, one repository per entity, import rules between store
+        and engine.</span
+      >
+    </div>
+    <div class="entry">
+      <a href="event-sourcing.html">Event sourcing</a>
+      <span class="desc">How a <code>Decision</code> is derived by replaying its action log.</span>
+    </div>
+    <div class="entry">
+      <a href="auth.html">Auth</a>
+      <span class="desc"
+        >Magic-link auth via better-auth: routes, session, mailer, GET-then-POST flow.</span
+      >
+    </div>
+    <div class="entry">
+      <a href="styling.html">Styling &amp; theming</a>
+      <span class="desc"
+        >Tailwind v4 <code>@theme</code> tokens, Solarized palette, shared CSS between app and
+        Storybook.</span
+      >
+    </div>
+    <div class="entry">
+      <a href="storybook.html">Storybook</a>
+      <span class="desc"
+        >Component sandbox, story format, and the patterns that keep components renderable in both
+        SvelteKit and Storybook.</span
+      >
+    </div>
+    <div class="entry">
+      <a href="form-mocking.html">Storybook-compatible forms</a>
+      <span class="desc"
+        >The <code>mockSubmit</code> prop that lets a form post to a real SvelteKit action in the
+        app but intercept and cancel it in Storybook.</span
+      >
+    </div>
+    <div class="entry">
+      <a href="testing.html">Testing</a>
+      <span class="desc"
+        >Two vitest projects (Node + browser), Storybook integration, where tests live.</span
+      >
+    </div>
 
-<h2>Ops</h2>
-<div class="entry"><a href="cli.html">CLI</a>
-  <span class="desc">Admin commands (<code>migrate</code>, <code>migrate:status</code>, ...) — same code path local and in container.</span></div>
-<div class="entry"><a href="deploy.html">Deployment</a>
-  <span class="desc">Single-VM Docker Compose + Traefik + Let's Encrypt + GitHub Actions push-to-deploy.</span></div>
+    <h2>Ops</h2>
+    <div class="entry">
+      <a href="cli.html">CLI</a>
+      <span class="desc"
+        >Admin commands (<code>migrate</code>, <code>migrate:status</code>, ...) — same code path
+        local and in container.</span
+      >
+    </div>
+    <div class="entry">
+      <a href="deploy.html">Deployment</a>
+      <span class="desc"
+        >Single-VM Docker Compose + Traefik + Let's Encrypt + GitHub Actions push-to-deploy.</span
+      >
+    </div>
 
-<h2>For agents</h2>
-<div class="entry"><a href="agents/index.html">Agent notes</a>
-  <span class="desc">Guidance for AI agents working in this repo. Start here before touching files.</span></div>
-</body>
+    <h2>For agents</h2>
+    <div class="entry">
+      <a href="agents/index.html">Agent notes</a>
+      <span class="desc"
+        >Guidance for AI agents working in this repo. Start here before touching files.</span
+      >
+    </div>
+  </body>
 </html>

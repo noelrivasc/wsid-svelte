@@ -34,19 +34,59 @@ export const sampleActions: Action[] = [
   },
 
   // scenarios: add three, edit one
-  { type: 'scenario/add', version: 1, payload: { ...stayScenario, id: scenarioIds.stay, title: 'Stay (draft)' } },
+  {
+    type: 'scenario/add',
+    version: 1,
+    payload: { ...stayScenario, id: scenarioIds.stay, title: 'Stay (draft)' }
+  },
   { type: 'scenario/edit', version: 1, payload: { ...stayScenario, id: scenarioIds.stay } },
   { type: 'scenario/add', version: 1, payload: { ...newJobScenario, id: scenarioIds.newJob } },
   { type: 'scenario/add', version: 1, payload: { ...indieScenario, id: scenarioIds.indie } },
 
   // scenarioFactorValue/set for every cell
-  { type: 'scenarioFactorValue/set', version: 1, payload: { scenarioId: scenarioIds.stay, factorId: factorIds.salary, value: 5 } },
-  { type: 'scenarioFactorValue/set', version: 1, payload: { scenarioId: scenarioIds.stay, factorId: factorIds.commute, value: 8 } },
-  { type: 'scenarioFactorValue/set', version: 1, payload: { scenarioId: scenarioIds.stay, factorId: factorIds.culture, value: 7 } },
-  { type: 'scenarioFactorValue/set', version: 1, payload: { scenarioId: scenarioIds.newJob, factorId: factorIds.salary, value: 9 } },
-  { type: 'scenarioFactorValue/set', version: 1, payload: { scenarioId: scenarioIds.newJob, factorId: factorIds.commute, value: 3 } },
-  { type: 'scenarioFactorValue/set', version: 1, payload: { scenarioId: scenarioIds.newJob, factorId: factorIds.culture, value: 6 } },
-  { type: 'scenarioFactorValue/set', version: 1, payload: { scenarioId: scenarioIds.indie, factorId: factorIds.salary, value: 4 } },
-  { type: 'scenarioFactorValue/set', version: 1, payload: { scenarioId: scenarioIds.indie, factorId: factorIds.commute, value: 10 } },
-  { type: 'scenarioFactorValue/set', version: 1, payload: { scenarioId: scenarioIds.indie, factorId: factorIds.culture, value: null } }
+  {
+    type: 'scenarioFactorValue/set',
+    version: 1,
+    payload: { scenarioId: scenarioIds.stay, factorId: factorIds.salary, value: 5 }
+  },
+  {
+    type: 'scenarioFactorValue/set',
+    version: 1,
+    payload: { scenarioId: scenarioIds.stay, factorId: factorIds.commute, value: 8 }
+  },
+  {
+    type: 'scenarioFactorValue/set',
+    version: 1,
+    payload: { scenarioId: scenarioIds.stay, factorId: factorIds.culture, value: 7 }
+  },
+  {
+    type: 'scenarioFactorValue/set',
+    version: 1,
+    payload: { scenarioId: scenarioIds.newJob, factorId: factorIds.salary, value: 9 }
+  },
+  {
+    type: 'scenarioFactorValue/set',
+    version: 1,
+    payload: { scenarioId: scenarioIds.newJob, factorId: factorIds.commute, value: 3 }
+  },
+  {
+    type: 'scenarioFactorValue/set',
+    version: 1,
+    payload: { scenarioId: scenarioIds.newJob, factorId: factorIds.culture, value: 6 }
+  },
+  {
+    type: 'scenarioFactorValue/set',
+    version: 1,
+    payload: { scenarioId: scenarioIds.indie, factorId: factorIds.salary, value: 4 }
+  },
+  {
+    type: 'scenarioFactorValue/set',
+    version: 1,
+    payload: { scenarioId: scenarioIds.indie, factorId: factorIds.commute, value: 10 }
+  },
+  {
+    type: 'scenarioFactorValue/set',
+    version: 1,
+    payload: { scenarioId: scenarioIds.indie, factorId: factorIds.culture, value: null }
+  }
 ];

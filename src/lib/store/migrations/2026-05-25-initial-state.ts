@@ -12,7 +12,7 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable('actions')
     .addColumn('decision_id', 'text', (col) =>
-      col.references('decisions.id').onDelete('cascade').notNull(),
+      col.references('decisions.id').onDelete('cascade').notNull()
     )
     .addColumn('seq', 'integer', (col) => col.notNull())
     .addColumn('type', 'text', (col) => col.notNull())
@@ -48,9 +48,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('updatedAt', 'date', (col) => col.notNull())
     .addColumn('ipAddress', 'text')
     .addColumn('userAgent', 'text')
-    .addColumn('userId', 'text', (col) =>
-      col.references('user.id').onDelete('cascade').notNull(),
-    )
+    .addColumn('userId', 'text', (col) => col.references('user.id').onDelete('cascade').notNull())
     .execute();
 
   await db.schema
@@ -58,9 +56,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('id', 'text', (col) => col.primaryKey())
     .addColumn('accountId', 'text', (col) => col.notNull())
     .addColumn('providerId', 'text', (col) => col.notNull())
-    .addColumn('userId', 'text', (col) =>
-      col.references('user.id').onDelete('cascade').notNull(),
-    )
+    .addColumn('userId', 'text', (col) => col.references('user.id').onDelete('cascade').notNull())
     .addColumn('accessToken', 'text')
     .addColumn('refreshToken', 'text')
     .addColumn('idToken', 'text')
@@ -82,17 +78,9 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('updatedAt', 'date', (col) => col.notNull())
     .execute();
 
-  await db.schema
-    .createIndex('session_userId_idx')
-    .on('session')
-    .column('userId')
-    .execute();
+  await db.schema.createIndex('session_userId_idx').on('session').column('userId').execute();
 
-  await db.schema
-    .createIndex('account_userId_idx')
-    .on('account')
-    .column('userId')
-    .execute();
+  await db.schema.createIndex('account_userId_idx').on('account').column('userId').execute();
 
   await db.schema
     .createIndex('verification_identifier_idx')

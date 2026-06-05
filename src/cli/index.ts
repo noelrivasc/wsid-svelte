@@ -10,11 +10,7 @@ import { createDb } from '../lib/store/db';
 import { appendAction, createDecision } from '../lib/store/decisionRepository';
 import { createMigrator } from '../lib/store/migrator';
 import { bundledMigrationProvider } from '../lib/store/migrations.bundled';
-import {
-  sampleActions,
-  sampleDecisionId,
-  sampleInitialMetadata,
-} from '../lib/test_data/actions';
+import { sampleActions, sampleDecisionId, sampleInitialMetadata } from '../lib/test_data/actions';
 import { sampleUser, sampleUserId } from '../lib/test_data/user';
 
 function migrator() {
@@ -34,7 +30,7 @@ const migrate = defineCommand({
       process.exit(1);
     }
     console.log(results?.length ? '\nDone.' : 'Nothing to do — all migrations already applied.');
-  },
+  }
 });
 
 const migrateStatus = defineCommand({
@@ -49,7 +45,7 @@ const migrateStatus = defineCommand({
       const state = m.executedAt ? `applied ${m.executedAt.toISOString()}` : 'pending';
       console.log(`  ${m.name} — ${state}`);
     }
-  },
+  }
 });
 
 const migrateDown = defineCommand({
@@ -63,13 +59,13 @@ const migrateDown = defineCommand({
       console.error('\nRollback failed:', error);
       process.exit(1);
     }
-  },
+  }
 });
 
 const seed = defineCommand({
   meta: {
     name: 'seed',
-    description: 'Insert the sample decision into the DB. Idempotent.',
+    description: 'Insert the sample decision into the DB. Idempotent.'
   },
   async run() {
     const db = createDb(config.databasePath);
@@ -82,7 +78,7 @@ const seed = defineCommand({
 
       if (existing) {
         console.log(
-          `Sample decision ${sampleDecisionId} already present at ${config.databasePath}; skipping.`,
+          `Sample decision ${sampleDecisionId} already present at ${config.databasePath}; skipping.`
         );
         return;
       }
@@ -105,13 +101,11 @@ const seed = defineCommand({
       for (const action of sampleActions) {
         await appendAction(sampleDecisionId, action, now, sampleUserId, db);
       }
-      console.log(
-        `Seeded ${sampleActions.length + 1} actions into ${config.databasePath}.`,
-      );
+      console.log(`Seeded ${sampleActions.length + 1} actions into ${config.databasePath}.`);
     } finally {
       await db.destroy();
     }
-  },
+  }
 });
 
 const main = defineCommand({
@@ -120,8 +114,8 @@ const main = defineCommand({
     migrate,
     'migrate:status': migrateStatus,
     'migrate:down': migrateDown,
-    seed,
-  },
+    seed
+  }
 });
 
 runMain(main);

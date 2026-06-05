@@ -14,7 +14,7 @@ export function createMigrator(databasePath: string, provider: MigrationProvider
   sqlite.pragma('foreign_keys = ON');
 
   const db = new Kysely<any>({
-    dialect: new SqliteDialect({ database: sqlite }),
+    dialect: new SqliteDialect({ database: sqlite })
   });
 
   return new Migrator({ db, provider });

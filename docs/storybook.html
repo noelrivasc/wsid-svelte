@@ -1,28 +1,41 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<title>Storybook · wsid-svelte</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<nav class="top"><a href="index.html">← docs</a></nav>
-<h1>Storybook</h1>
-<p class="lede">Component sandbox at <code>:6006</code>. Stories double as smoke tests via the Vitest addon.</p>
+  <head>
+    <meta charset="utf-8" />
+    <title>Storybook · wsid-svelte</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <nav class="top"><a href="index.html">← docs</a></nav>
+    <h1>Storybook</h1>
+    <p class="lede">
+      Component sandbox at <code>:6006</code>. Stories double as smoke tests via the Vitest addon.
+    </p>
 
-<h2>Run</h2>
-<pre><code>pnpm storybook        # dev server on :6006
+    <h2>Run</h2>
+    <pre><code>pnpm storybook        # dev server on :6006
 pnpm build-storybook  # static build</code></pre>
 
-<h2>Config</h2>
-<ul>
-  <li><code>.storybook/main.ts</code> — framework <code>@storybook/sveltekit</code>, globs <code>../src/**/*.stories.@(js|ts|svelte)</code>, addons: svelte-csf, vitest, a11y, docs, chromatic.</li>
-  <li><code>.storybook/preview.ts</code> — imports <code>../src/lib/app.css</code> so Tailwind + <code>@theme</code> tokens apply inside stories.</li>
-</ul>
+    <h2>Config</h2>
+    <ul>
+      <li>
+        <code>.storybook/main.ts</code> — framework <code>@storybook/sveltekit</code>, globs
+        <code>../src/**/*.stories.@(js|ts|svelte)</code>, addons: svelte-csf, vitest, a11y, docs,
+        chromatic.
+      </li>
+      <li>
+        <code>.storybook/preview.ts</code> — imports <code>../src/lib/app.css</code> so Tailwind +
+        <code>@theme</code> tokens apply inside stories.
+      </li>
+    </ul>
 
-<h2>Story format</h2>
-<p>Use <code>.stories.svelte</code> via <code>@storybook/addon-svelte-csf</code>. One <code>defineMeta</code>, then one or more <code>&lt;Story&gt;</code> blocks. Co-locate with the component.</p>
-<pre><code>&lt;script module lang="ts"&gt;
+    <h2>Story format</h2>
+    <p>
+      Use <code>.stories.svelte</code> via <code>@storybook/addon-svelte-csf</code>. One
+      <code>defineMeta</code>, then one or more <code>&lt;Story&gt;</code> blocks. Co-locate with
+      the component.
+    </p>
+    <pre><code>&lt;script module lang="ts"&gt;
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import { fn } from 'storybook/test';
   import FactorsList from './FactorsList.svelte';
@@ -39,33 +52,81 @@ pnpm build-storybook  # static build</code></pre>
 &lt;Story name="Default" /&gt;
 &lt;Story name="Empty" args={{ factors: [], onAdd: fn(), onEdit: fn(), onDelete: fn() }} /&gt;</code></pre>
 
-<h2>Making components render in both contexts</h2>
-<p>SvelteKit and Storybook are two separate runtimes with different bundlers and entry points. A component that works in one but breaks in the other is almost always relying on something only one of them provides. The patterns below keep both happy.</p>
+    <h2>Making components render in both contexts</h2>
+    <p>
+      SvelteKit and Storybook are two separate runtimes with different bundlers and entry points. A
+      component that works in one but breaks in the other is almost always relying on something only
+      one of them provides. The patterns below keep both happy.
+    </p>
 
-<h3>1. Shared CSS, single source</h3>
-<p>Both contexts import <code>src/lib/app.css</code> — SvelteKit via <code>src/routes/+layout.svelte</code>, Storybook via <code>.storybook/preview.ts</code>. The Tailwind <code>@theme</code> tokens (and the <code>body</code> background rule in <code>@layer base</code>) live there once. Don't duplicate styles into <code>app.html</code> or Storybook decorators — both contexts must consume the same file or the theming silently diverges.</p>
+    <h3>1. Shared CSS, single source</h3>
+    <p>
+      Both contexts import <code>src/lib/app.css</code> — SvelteKit via
+      <code>src/routes/+layout.svelte</code>, Storybook via <code>.storybook/preview.ts</code>. The
+      Tailwind <code>@theme</code> tokens (and the <code>body</code> background rule in
+      <code>@layer base</code>) live there once. Don't duplicate styles into
+      <code>app.html</code> or Storybook decorators — both contexts must consume the same file or
+      the theming silently diverges.
+    </p>
 
-<h3>2. Props in, callbacks out</h3>
-<p>Components receive data through <code>$props()</code> and announce events through callback props (<code>onAdd</code>, <code>onEdit</code>, …). No direct imports from <code>$lib/store/*</code>, no SvelteKit form actions, no <code>$page</code> reads. In Storybook, callbacks are stubbed with <code>fn()</code> from <code>storybook/test</code>; in routes, they're wired to real handlers. Same component, both contexts.</p>
+    <h3>2. Props in, callbacks out</h3>
+    <p>
+      Components receive data through <code>$props()</code> and announce events through callback
+      props (<code>onAdd</code>, <code>onEdit</code>, …). No direct imports from
+      <code>$lib/store/*</code>, no SvelteKit form actions, no <code>$page</code> reads. In
+      Storybook, callbacks are stubbed with <code>fn()</code> from <code>storybook/test</code>; in
+      routes, they're wired to real handlers. Same component, both contexts.
+    </p>
 
-<h3>3. Fixtures from <code>$lib/test_data/</code></h3>
-<p>Stories pass realistic data that satisfies the Zod schemas (e.g. <code>sampleFactors</code>, <code>singleFactor</code>). Same fixtures are reused by component tests and the seed script. Never import production data sources into a story.</p>
+    <h3>3. Fixtures from <code>$lib/test_data/</code></h3>
+    <p>
+      Stories pass realistic data that satisfies the Zod schemas (e.g. <code>sampleFactors</code>,
+      <code>singleFactor</code>). Same fixtures are reused by component tests and the seed script.
+      Never import production data sources into a story.
+    </p>
 
-<h3>4. Avoid SvelteKit-only modules in components</h3>
-<p>Storybook does not provide <code>$app/*</code>, <code>$env/*</code>, or any of the <code>+page.server.ts</code> machinery. If a component needs the current URL or env values, accept them as props from the route. The component stays portable; the route does the wiring.</p>
+    <h3>4. Avoid SvelteKit-only modules in components</h3>
+    <p>
+      Storybook does not provide <code>$app/*</code>, <code>$env/*</code>, or any of the
+      <code>+page.server.ts</code> machinery. If a component needs the current URL or env values,
+      accept them as props from the route. The component stays portable; the route does the wiring.
+    </p>
 
-<h3>5. Zod validation at the prop boundary</h3>
-<p>For components with a non-trivial prop shape, validate <code>$props()</code> with the component's Zod schema (see <code>TestBox.svelte</code>): success path renders, failure renders a <code>role="alert"</code> panel listing issues. Storybook can then have an <code>InvalidProps</code> story (cast to <code>any</code> to bypass the compile-time check) that exercises the runtime guard.</p>
+    <h3>5. Zod validation at the prop boundary</h3>
+    <p>
+      For components with a non-trivial prop shape, validate <code>$props()</code> with the
+      component's Zod schema (see <code>TestBox.svelte</code>): success path renders, failure
+      renders a <code>role="alert"</code> panel listing issues. Storybook can then have an
+      <code>InvalidProps</code> story (cast to <code>any</code> to bypass the compile-time check)
+      that exercises the runtime guard.
+    </p>
 
-<h2>Stories as tests</h2>
-<p>The <code>@storybook/addon-vitest</code> addon auto-runs every <code>*.stories.svelte</code> through Vitest as a smoke test (mounts the story, asserts no render error or a11y violation per <code>parameters.a11y.test</code>). This runs as part of <code>pnpm test</code> alongside the explicit component specs.</p>
-<p>Result: a passing story is also a passing render test, with no extra file. Reserve explicit <code>*.svelte.spec.ts</code> for behavioural assertions (interactions, error UI, branch coverage) — see <a href="testing.html">testing</a>.</p>
+    <h2>Stories as tests</h2>
+    <p>
+      The <code>@storybook/addon-vitest</code> addon auto-runs every
+      <code>*.stories.svelte</code> through Vitest as a smoke test (mounts the story, asserts no
+      render error or a11y violation per <code>parameters.a11y.test</code>). This runs as part of
+      <code>pnpm test</code> alongside the explicit component specs.
+    </p>
+    <p>
+      Result: a passing story is also a passing render test, with no extra file. Reserve explicit
+      <code>*.svelte.spec.ts</code> for behavioural assertions (interactions, error UI, branch
+      coverage) — see <a href="testing.html">testing</a>.
+    </p>
 
-<h2>Naming &amp; placement</h2>
-<ul>
-  <li>One <code>.stories.svelte</code> per component, sitting next to it.</li>
-  <li>Story <code>title</code>: <code>Components/&lt;Feature&gt;/&lt;ComponentName&gt;</code> (e.g. <code>Components/Factors/FactorsList</code>). Mirrors the directory layout so the sidebar tree matches the file tree.</li>
-  <li>Story names describe state: <code>Default</code>, <code>Empty</code>, <code>SingleFactor</code>, <code>InvalidProps</code>. Not "happy path" / "edge case 1".</li>
-</ul>
-</body>
+    <h2>Naming &amp; placement</h2>
+    <ul>
+      <li>One <code>.stories.svelte</code> per component, sitting next to it.</li>
+      <li>
+        Story <code>title</code>:
+        <code>Components/&lt;Feature&gt;/&lt;ComponentName&gt;</code> (e.g.
+        <code>Components/Factors/FactorsList</code>). Mirrors the directory layout so the sidebar
+        tree matches the file tree.
+      </li>
+      <li>
+        Story names describe state: <code>Default</code>, <code>Empty</code>,
+        <code>SingleFactor</code>, <code>InvalidProps</code>. Not "happy path" / "edge case 1".
+      </li>
+    </ul>
+  </body>
 </html>

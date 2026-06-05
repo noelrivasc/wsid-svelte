@@ -1,90 +1,159 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<title>Auth · wsid-svelte</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<nav class="top"><a href="index.html">← docs</a></nav>
-<h1>Auth</h1>
-<p class="lede">Passwordless email + magic links via <code>better-auth</code>. Same SQLite file as the app; sessions are server-stored and revocable.</p>
+  <head>
+    <meta charset="utf-8" />
+    <title>Auth · wsid-svelte</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <nav class="top"><a href="index.html">← docs</a></nav>
+    <h1>Auth</h1>
+    <p class="lede">
+      Passwordless email + magic links via <code>better-auth</code>. Same SQLite file as the app;
+      sessions are server-stored and revocable.
+    </p>
 
-<h2>Map</h2>
-<table>
-  <tr><th>Where</th><th>What</th></tr>
-  <tr><td><code>src/lib/auth/index.ts</code></td><td>better-auth instance (lazy <code>getAuth()</code>). Magic-link plugin + <code>sveltekitCookies</code>.</td></tr>
-  <tr><td><code>src/lib/utils/mailer.ts</code></td><td>nodemailer wrapper used by the magic-link callback.</td></tr>
-  <tr><td><code>src/lib/store/userRepository.ts</code></td><td><code>getUserByEmail</code> — used by login to check existence before sending.</td></tr>
-  <tr><td><code>src/hooks.server.ts</code></td><td>Resolves session per request, populates <code>locals.user</code> / <code>locals.session</code>, then hands off to better-auth's handler.</td></tr>
-  <tr><td><code>src/app.d.ts</code></td><td>Declares <code>App.Locals</code> from better-auth's session type.</td></tr>
-  <tr><td><code>src/routes/users/login/</code></td><td>Email entry + GET-then-POST confirm. Existing users only.</td></tr>
-  <tr><td><code>src/routes/users/register/</code></td><td>Same shape as login, but always attempts to send (better-auth creates the account on first use).</td></tr>
-  <tr><td><code>src/routes/users/logout/</code></td><td>POST-only signOut.</td></tr>
-  <tr><td><code>src/routes/users/me/</code></td><td>Protected route, redirects to <code>/users/login</code> when <code>locals.user</code> is null.</td></tr>
-</table>
+    <h2>Map</h2>
+    <table>
+      <tr>
+        <th>Where</th>
+        <th>What</th>
+      </tr>
+      <tr>
+        <td><code>src/lib/auth/index.ts</code></td>
+        <td>
+          better-auth instance (lazy <code>getAuth()</code>). Magic-link plugin +
+          <code>sveltekitCookies</code>.
+        </td>
+      </tr>
+      <tr>
+        <td><code>src/lib/utils/mailer.ts</code></td>
+        <td>nodemailer wrapper used by the magic-link callback.</td>
+      </tr>
+      <tr>
+        <td><code>src/lib/store/userRepository.ts</code></td>
+        <td><code>getUserByEmail</code> — used by login to check existence before sending.</td>
+      </tr>
+      <tr>
+        <td><code>src/hooks.server.ts</code></td>
+        <td>
+          Resolves session per request, populates <code>locals.user</code> /
+          <code>locals.session</code>, then hands off to better-auth's handler.
+        </td>
+      </tr>
+      <tr>
+        <td><code>src/app.d.ts</code></td>
+        <td>Declares <code>App.Locals</code> from better-auth's session type.</td>
+      </tr>
+      <tr>
+        <td><code>src/routes/users/login/</code></td>
+        <td>Email entry + GET-then-POST confirm. Existing users only.</td>
+      </tr>
+      <tr>
+        <td><code>src/routes/users/register/</code></td>
+        <td>
+          Same shape as login, but always attempts to send (better-auth creates the account on first
+          use).
+        </td>
+      </tr>
+      <tr>
+        <td><code>src/routes/users/logout/</code></td>
+        <td>POST-only signOut.</td>
+      </tr>
+      <tr>
+        <td><code>src/routes/users/me/</code></td>
+        <td>
+          Protected route, redirects to <code>/users/login</code> when <code>locals.user</code> is
+          null.
+        </td>
+      </tr>
+    </table>
 
-<h2>Flow (login &amp; register)</h2>
-<p>Both routes share the same magic-link path; they differ only at the entry step.</p>
-<div class="mermaid">
-sequenceDiagram
-  participant U as User
-  participant R as Route
-  participant A as better-auth
-  participant M as Mailer
-  participant DB as SQLite
-  alt POST /users/login
-    U->>R: email
-    R->>DB: getUserByEmail
-    Note over R: only proceed if user exists
-  else POST /users/register
-    U->>R: email
-    Note over R: always proceed (create-on-first-use)
-  end
-  R->>A: signInMagicLink
-  A->>M: sendEmail(link+token)
-  M-->>U: email with /confirm?token
-  U->>R: GET /confirm?token (form, token not consumed)
-  U->>R: POST /confirm (token)
-  R->>A: magicLinkVerify
-  A->>DB: consume token, create session
-  A-->>U: Set-Cookie session
-  R-->>U: 303 → /
-</div>
-<ol>
-  <li><code>POST /users/login</code> — validate email with Zod; if the user exists, call <code>auth.api.signInMagicLink</code>. Always respond with the same neutral message.</li>
-  <li><code>POST /users/register</code> — same shape, but skips the existence check and always calls <code>signInMagicLink</code>; better-auth creates the account on first verify.</li>
-  <li>The magic-link callback (in <code>$lib/auth</code>) builds a URL pointing at <code>/users/login/confirm?token=…</code> and emails it via the mailer.</li>
-  <li><code>GET /users/login/confirm</code> — renders a form with the token in a hidden field. <strong>Does not consume the token.</strong> This defeats email prefetchers and corporate URL scanners.</li>
-  <li><code>POST /users/login/confirm</code> — calls <code>auth.api.magicLinkVerify</code>, which consumes the token (single-use), mints a session, and sets the cookie via the <code>sveltekitCookies</code> plugin. Then redirects to <code>/</code> or a same-origin <code>redirectTo</code>.</li>
-</ol>
+    <h2>Flow (login &amp; register)</h2>
+    <p>Both routes share the same magic-link path; they differ only at the entry step.</p>
+    <div class="mermaid">
+      sequenceDiagram participant U as User participant R as Route participant A as better-auth
+      participant M as Mailer participant DB as SQLite alt POST /users/login U->>R: email R->>DB:
+      getUserByEmail Note over R: only proceed if user exists else POST /users/register U->>R: email
+      Note over R: always proceed (create-on-first-use) end R->>A: signInMagicLink A->>M:
+      sendEmail(link+token) M-->>U: email with /confirm?token U->>R: GET /confirm?token (form, token
+      not consumed) U->>R: POST /confirm (token) R->>A: magicLinkVerify A->>DB: consume token,
+      create session A-->>U: Set-Cookie session R-->>U: 303 → /
+    </div>
+    <ol>
+      <li>
+        <code>POST /users/login</code> — validate email with Zod; if the user exists, call
+        <code>auth.api.signInMagicLink</code>. Always respond with the same neutral message.
+      </li>
+      <li>
+        <code>POST /users/register</code> — same shape, but skips the existence check and always
+        calls <code>signInMagicLink</code>; better-auth creates the account on first verify.
+      </li>
+      <li>
+        The magic-link callback (in <code>$lib/auth</code>) builds a URL pointing at
+        <code>/users/login/confirm?token=…</code> and emails it via the mailer.
+      </li>
+      <li>
+        <code>GET /users/login/confirm</code> — renders a form with the token in a hidden field.
+        <strong>Does not consume the token.</strong> This defeats email prefetchers and corporate
+        URL scanners.
+      </li>
+      <li>
+        <code>POST /users/login/confirm</code> — calls <code>auth.api.magicLinkVerify</code>, which
+        consumes the token (single-use), mints a session, and sets the cookie via the
+        <code>sveltekitCookies</code> plugin. Then redirects to <code>/</code> or a same-origin
+        <code>redirectTo</code>.
+      </li>
+    </ol>
 
-<h2>Session</h2>
-<ul>
-  <li>Opaque session cookie (httpOnly, secure in prod, <code>path=/</code>). Source of truth is the <code>session</code> row in SQLite.</li>
-  <li><code>expiresIn</code>: 7 days. <code>updateAge</code>: 1 day — refreshes the row on activity at most once per day to limit writes.</li>
-  <li>Single-use magic tokens; <code>expiresIn</code>: 1 hour.</li>
-</ul>
+    <h2>Session</h2>
+    <ul>
+      <li>
+        Opaque session cookie (httpOnly, secure in prod, <code>path=/</code>). Source of truth is
+        the <code>session</code> row in SQLite.
+      </li>
+      <li>
+        <code>expiresIn</code>: 7 days. <code>updateAge</code>: 1 day — refreshes the row on
+        activity at most once per day to limit writes.
+      </li>
+      <li>Single-use magic tokens; <code>expiresIn</code>: 1 hour.</li>
+    </ul>
 
-<h2>Asymmetry: login vs register</h2>
-<p><code>/users/login</code> checks <code>getUserByEmail</code> first and only sends the link if the user exists. <code>/users/register</code> always sends (relying on better-auth's create-on-first-use). The two routes return identical neutral copy, but a careful observer could distinguish them by timing or by which route they hit. This is a deliberate UX choice — the surface still doesn't leak existence within a single route.</p>
+    <h2>Asymmetry: login vs register</h2>
+    <p>
+      <code>/users/login</code> checks <code>getUserByEmail</code> first and only sends the link if
+      the user exists. <code>/users/register</code> always sends (relying on better-auth's
+      create-on-first-use). The two routes return identical neutral copy, but a careful observer
+      could distinguish them by timing or by which route they hit. This is a deliberate UX choice —
+      the surface still doesn't leak existence within a single route.
+    </p>
 
-<h2>Mailer</h2>
-<p><code>src/lib/utils/mailer.ts</code> is a thin nodemailer wrapper exposing one <code>sendEmail({ to, subject, text, html })</code>. Config (host/port/user/pass/from) flows from <a href="env.html">env vars</a>. Locally it points at mailpit — see <a href="setup-docker.html#mailpit">Docker setup</a>.</p>
+    <h2>Mailer</h2>
+    <p>
+      <code>src/lib/utils/mailer.ts</code> is a thin nodemailer wrapper exposing one
+      <code>sendEmail({ to, subject, text, html })</code>. Config (host/port/user/pass/from) flows
+      from <a href="env.html">env vars</a>. Locally it points at mailpit — see
+      <a href="setup-docker.html#mailpit">Docker setup</a>.
+    </p>
 
-<h2>Protecting a route</h2>
-<pre><code>// any +page.server.ts
+    <h2>Protecting a route</h2>
+    <pre><code>// any +page.server.ts
 export const load = async ({ locals }) => {
   if (!locals.user) throw redirect(303, '/users/login');
   return { user: locals.user };
 };</code></pre>
 
-<h2>Schema</h2>
-<p>better-auth's tables (<code>user</code>, <code>session</code>, <code>account</code>, <code>verification</code>) live in the same SQLite file as domain tables. They're created by the initial migration. Don't reach into them from app code except via <code>userRepository.ts</code>; let better-auth own writes.</p>
-<script type="module">
-  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-  const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  mermaid.initialize({ startOnLoad: true, theme: dark ? 'dark' : 'default' });
-</script>
-</body>
+    <h2>Schema</h2>
+    <p>
+      better-auth's tables (<code>user</code>, <code>session</code>, <code>account</code>,
+      <code>verification</code>) live in the same SQLite file as domain tables. They're created by
+      the initial migration. Don't reach into them from app code except via
+      <code>userRepository.ts</code>; let better-auth own writes.
+    </p>
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+      const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      mermaid.initialize({ startOnLoad: true, theme: dark ? 'dark' : 'default' });
+    </script>
+  </body>
 </html>

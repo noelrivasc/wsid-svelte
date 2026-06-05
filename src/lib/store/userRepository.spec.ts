@@ -12,7 +12,7 @@ const sampleUser = {
   emailVerified: 1,
   image: null,
   createdAt: '2026-01-01',
-  updatedAt: '2026-01-02',
+  updatedAt: '2026-01-02'
 };
 
 describe('userRepository', () => {
@@ -31,7 +31,7 @@ describe('userRepository', () => {
       name: 'Alice',
       email: 'alice@example.com',
       emailVerified: 1,
-      image: null,
+      image: null
     };
     expect(user).toEqual(expected);
   });
