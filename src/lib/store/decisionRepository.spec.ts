@@ -7,6 +7,9 @@ import {
   createDecision,
   loadActions,
   loadDecisionList,
+  isOwner,
+  isPublic,
+  setPublicStatus,
   OwnershipError
 } from './decisionRepository';
 import { sampleActions, sampleDecisionId, sampleInitialMetadata } from '$lib/test_data/actions';
@@ -87,6 +90,40 @@ describe('store', () => {
     await insertUser(db, otherUserId, 'other@example.com');
     const actions = await loadActions(sampleDecisionId, otherUserId, db);
     expect(actions).toBeNull();
+  });
+
+  it('isOwner is true for the owner and false for others / missing decisions', async () => {
+    await seed(db);
+    await insertUser(db, otherUserId, 'other@example.com');
+    expect(await isOwner(sampleDecisionId, sampleUserId, db)).toBe(true);
+    expect(await isOwner(sampleDecisionId, otherUserId, db)).toBe(false);
+    expect(await isOwner('00000000-0000-4000-8000-000000000abc', sampleUserId, db)).toBe(false);
+  });
+
+  it('setPublicStatus toggles is_public for the owner', async () => {
+    await seed(db);
+    expect(await isPublic(sampleDecisionId, db)).toBe(false);
+    await setPublicStatus(sampleDecisionId, true, sampleUserId, db);
+    expect(await isPublic(sampleDecisionId, db)).toBe(true);
+    await setPublicStatus(sampleDecisionId, false, sampleUserId, db);
+    expect(await isPublic(sampleDecisionId, db)).toBe(false);
+  });
+
+  it('setPublicStatus rejects a non-owner with OwnershipError', async () => {
+    await seed(db);
+    await insertUser(db, otherUserId, 'other@example.com');
+    await expect(setPublicStatus(sampleDecisionId, true, otherUserId, db)).rejects.toBeInstanceOf(
+      OwnershipError
+    );
+  });
+
+  it('loadActions returns actions to a non-owner once the decision is public', async () => {
+    await seed(db);
+    await insertUser(db, otherUserId, 'other@example.com');
+    expect(await loadActions(sampleDecisionId, otherUserId, db)).toBeNull();
+    await setPublicStatus(sampleDecisionId, true, sampleUserId, db);
+    const actions = await loadActions(sampleDecisionId, otherUserId, db);
+    expect(hydrate(actions)).toEqual(sampleDecision);
   });
 
   it('appendAction rejects a non-owner with OwnershipError', async () => {

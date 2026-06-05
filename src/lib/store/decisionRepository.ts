@@ -36,22 +36,29 @@ export async function loadDecisionList(
     .execute();
 }
 
-// Returns null if the decision does not exist or is not owned by userId,
-// [] if it exists (and is owned) with no actions.
+// Returns null if the decision does not exist or is neither owned by userId
+// nor public, [] if it exists (and is readable) with no actions.
 export async function loadActions(
   decisionId: string,
-  userId: string,
+  userId?: string,
   db?: Kysely<DB>
 ): Promise<Action[] | null> {
   const c = db ?? (await getConnection());
-  const rows = await c
+  let query = c
     .selectFrom('decisions as d')
     .leftJoin('actions as a', 'a.decision_id', 'd.id')
     .select(['a.type', 'a.version', 'a.payload', 'a.seq'])
     .where('d.id', '=', decisionId)
-    .where('d.user_id', '=', userId)
-    .orderBy('a.seq')
-    .execute();
+
+  if (userId) {
+    query = query.where((eb) => eb.or([eb('d.user_id', '=', userId), eb('d.is_public', '=', 1)]));
+  } else {
+    query = query.where('d.is_public', '=', 1);
+  }
+
+  query = query.orderBy('a.seq');
+
+  const rows = await query.execute();
   if (rows.length === 0) return null;
   if (rows.length === 1 && rows[0].type === null) return [];
   return rows.map((r) =>
@@ -61,6 +68,58 @@ export async function loadActions(
       payload: JSON.parse(r.payload as string)
     })
   );
+}
+
+// Whether decisionId exists and is owned by userId. Used by routes to decide
+// between editable and read-only (public) rendering.
+export async function isOwner(
+  decisionId: string,
+  userId: string,
+  db?: Kysely<DB>
+): Promise<boolean> {
+  const c = db ?? (await getConnection());
+  const row = await c
+    .selectFrom('decisions')
+    .select('user_id')
+    .where('id', '=', decisionId)
+    .executeTakeFirst();
+  return !!row && row.user_id === userId;
+}
+
+// Current value of the public flag. Returns false if the decision is missing.
+export async function isPublic(decisionId: string, db?: Kysely<DB>): Promise<boolean> {
+  const c = db ?? (await getConnection());
+  const row = await c
+    .selectFrom('decisions')
+    .select('is_public')
+    .where('id', '=', decisionId)
+    .executeTakeFirst();
+  return !!row && row.is_public === 1;
+}
+
+// Toggle the public flag. This is a plain column on the decisions row, not an
+// event-sourced action. Ownership is enforced; non-owners get an OwnershipError.
+export async function setPublicStatus(
+  decisionId: string,
+  isPublic: boolean,
+  userId: string,
+  db?: Kysely<DB>
+): Promise<void> {
+  const c = db ?? (await getConnection());
+  await c.transaction().execute(async (tx) => {
+    const owner = await tx
+      .selectFrom('decisions')
+      .select('user_id')
+      .where('id', '=', decisionId)
+      .executeTakeFirst();
+    if (!owner || owner.user_id !== userId) throw new OwnershipError(decisionId);
+
+    await tx
+      .updateTable('decisions')
+      .set({ is_public: isPublic ? 1 : 0 })
+      .where('id', '=', decisionId)
+      .execute();
+  });
 }
 
 // Create the canvas: insert the decisions row and append the first updateMetadata
