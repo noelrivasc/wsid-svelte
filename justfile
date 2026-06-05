@@ -33,3 +33,16 @@ alias stopd := stop
 # Open dev URLs in the browser
 open:
 	./tmux-setup.sh open
+
+# Open a read-only sqlite cli
+db:
+  sqlite3 -readonly data/wsid.db
+
+dbw:
+  sqlite3 data/wsid.db
+
+dbd:
+  docker compose exec app sqlite3 -readonly data/wsid.db
+
+dbdw:
+  docker compose exec app sqlite3 data/wsid.db
