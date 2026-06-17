@@ -5,4 +5,4 @@
   let { title }: Props = $props();
 </script>
 
-<h1 class="text-xl text-body md:text-2xl">{title}</h1>
+<h1 class="text-semibold text-xl text-heading md:text-2xl">{title}</h1>
