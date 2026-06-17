@@ -1,7 +1,7 @@
 import type { Action, DecisionMetadata } from '$lib/schemas';
 import { factorIds, salaryFactor, commuteFactor, cultureFactor } from './factors';
 import { scenarioIds, stayScenario, newJobScenario, indieScenario } from './scenarios';
-import { sampleMetadata } from './decisionMetadata';
+import { shortMetadata } from './decisionMetadata';
 
 export const sampleDecisionId = 'a8f5e0c2-1d6b-4f7a-9e3c-8b4d2a1c5f6e';
 
@@ -10,7 +10,7 @@ export const sampleInitialMetadata: DecisionMetadata = { title: 'Draft', descrip
 
 // Action history applied after createDecision; exercises every action type.
 export const sampleActions: Action[] = [
-  { type: 'metadata/edit', version: 1, payload: sampleMetadata },
+  { type: 'metadata/edit', version: 1, payload: shortMetadata },
 
   // factors: add three, edit one, add+delete a fourth
   { type: 'factor/add', version: 1, payload: { ...salaryFactor, id: factorIds.salary, weight: 7 } },

@@ -3,6 +3,7 @@
   import type { SubmitFunction } from '@sveltejs/kit';
   import type { Snippet } from 'svelte';
   import { Label, Input, Button } from 'flowbite-svelte';
+  import { EnvelopeSolid } from 'flowbite-svelte-icons';
 
   type Props = {
     action?: string;
@@ -26,11 +27,24 @@
   };
 </script>
 
-<form method="POST" {action} use:enhance={submit} class="flex flex-col gap-4">
-  <Label class="space-y-2">
-    <span>Email</span>
-    <Input type="email" name="email" required autocomplete="email" placeholder="you@example.com" />
-  </Label>
+<form method="POST" {action} use:enhance={submit} class="my-4 flex max-w-96 flex-col gap-4">
+  <div>
+    <Label>
+      <span class="mb-2 inline-block">Email</span>
+      <Input
+        class="ps-8"
+        type="email"
+        name="email"
+        required
+        autocomplete="email"
+        placeholder="you@example.com"
+      >
+        {#snippet left()}
+          <EnvelopeSolid class="h-4 w-4" />
+        {/snippet}
+      </Input>
+    </Label>
+  </div>
 
   <Button type="submit" class="bg-cta text-body-inverted hover:bg-cta/90 focus:ring-c01">
     {submitLabel}

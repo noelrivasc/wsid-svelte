@@ -2,6 +2,7 @@
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
   import DecisionCreateForm from '$lib/components/decision/DecisionCreateForm.svelte';
+  import PageTitle from '$lib/components/page_elements/PageTitle.svelte';
 
   const toList = () => goto(resolve('/decisions'));
   // No-op: the addDecision action redirects (303) to the new decision on success,
@@ -9,5 +10,7 @@
   // non-redirect success result, which this action never returns.
   const onSuccess = () => {};
 </script>
+
+<PageTitle title="New decision" />
 
 <DecisionCreateForm onCancel={toList} {onSuccess} />

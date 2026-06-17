@@ -1,10 +1,11 @@
 <script lang="ts">
   import type { PageData } from './$types';
   import UserConfirmLogin from '$lib/components/user/UserConfirmLogin.svelte';
+  import PageTitle from '$lib/components/page_elements/PageTitle.svelte';
 
   let { data }: { data: PageData } = $props();
 </script>
 
-<h1>Confirm login</h1>
+<PageTitle title="Log in" />
 
 <UserConfirmLogin token={data.token} />

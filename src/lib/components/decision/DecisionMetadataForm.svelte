@@ -62,9 +62,15 @@
   };
 </script>
 
-<form method="POST" {action} use:enhance={submit} class="flex flex-col gap-4" novalidate>
+<form
+  method="POST"
+  {action}
+  use:enhance={submit}
+  class="my-4 flex max-w-96 flex-col gap-4"
+  novalidate
+>
   <Label class="space-y-2">
-    <span>Title</span>
+    <span class="mb-2 inline-block">Title <span class="text-xs text-accent-blue">*</span></span>
     <Input
       type="text"
       name="title"
@@ -75,13 +81,14 @@
       required
     />
     {#if titleTouched && errors.title}
-      <Helper class="text-accent-red">{errors.title}</Helper>
+      <Helper class="text-accent-red dark:text-accent-red">{errors.title}</Helper>
     {/if}
   </Label>
 
   <Label class="space-y-2">
-    <span>Description <span class="text-body-subtle">(optional)</span></span>
+    <span class="mb-2 inline-block">Description</span>
     <Textarea
+      class="w-100"
       name="description"
       bind:value={description}
       onblur={() => (descriptionTouched = true)}
