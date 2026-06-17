@@ -1,7 +1,7 @@
 import type { Decision, ScenarioFactorValues } from '$lib/schemas';
 import { coreFactors, factorIds } from './factors';
 import { sampleScenarios, scenarioIds } from './scenarios';
-import { sampleMetadata } from './decisionMetadata';
+import { shortMetadata } from './decisionMetadata';
 
 export const sampleScenarioFactorValues: ScenarioFactorValues = {
   [scenarioIds.stay]: {
@@ -22,7 +22,7 @@ export const sampleScenarioFactorValues: ScenarioFactorValues = {
 };
 
 export const sampleDecision: Decision = {
-  metadata: sampleMetadata,
+  metadata: shortMetadata,
   factors: coreFactors,
   scenarios: sampleScenarios,
   scenarioFactorValues: sampleScenarioFactorValues

@@ -3,7 +3,7 @@
   import { fn } from 'storybook/test';
   import DecisionMetadataFormAdd from './DecisionMetadataFormAdd.svelte';
   import DecisionMetadataFormEdit from './DecisionMetadataFormEdit.svelte';
-  import { sampleMetadata, minimalMetadata } from '$lib/test_data';
+  import { longMetadata, shortMetadata, minimalMetadata } from '$lib/test_data';
 
   const { Story } = defineMeta({
     title: 'Components/Decision/DecisionMetadataForm',
@@ -24,7 +24,7 @@
 </Story>
 
 <Story name="DecisionMetadataFormEdit">
-  <DecisionMetadataFormEdit metadata={sampleMetadata} mockSubmit={fn()} onCancel={fn()} />
+  <DecisionMetadataFormEdit metadata={shortMetadata} mockSubmit={fn()} onCancel={fn()} />
 </Story>
 
 <Story name="DecisionMetadataFormEdit: minimal">
