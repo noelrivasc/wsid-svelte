@@ -1,6 +1,9 @@
 import type { Decision } from '$lib/schemas';
 import type { Action } from '$lib/schemas';
 
+// IF the emptyDecision changes, versioning must be implemented
+// to avoid breaking the reducer for existing decisions.
+// See https://github.com/noelrivasc/wsid-svelte/issues/13
 export const emptyDecision: Decision = {
   metadata: { title: '', description: '' },
   factors: [],

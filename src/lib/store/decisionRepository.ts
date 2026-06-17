@@ -7,7 +7,7 @@ export type { DB } from './schema';
 import { actionSchema, type Action } from '$lib/schemas';
 import type { DecisionMetadata } from '$lib/schemas';
 // Uses `config.runtime` (process.env) because this module is reached from both
-// the SvelteKit server bundle and the standalone CLI bundle. See TODO.md.
+// the SvelteKit server bundle and the standalone CLI bundle.
 import { config } from '$lib/utils/config.runtime';
 
 export interface DecisionListItem {
