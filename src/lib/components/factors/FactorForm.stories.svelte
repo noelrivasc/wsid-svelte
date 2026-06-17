@@ -25,11 +25,11 @@
 </Story>
 
 <Story name="FactorFormEdit">
-  <FactorFormEdit factor={formSampleFactor} mockSubmit={fn()} mockDelete={fn()} onCancel={fn()} />
+  <FactorFormEdit factor={formSampleFactor} mockSubmit={fn()} onCancel={fn()} />
 </Story>
 
 <Story name="FactorFormEdit: minimal">
-  <FactorFormEdit factor={formMinimalFactor} mockSubmit={fn()} mockDelete={fn()} onCancel={fn()} />
+  <FactorFormEdit factor={formMinimalFactor} mockSubmit={fn()} onCancel={fn()} />
 </Story>
 
 <Story name="FactorFormDelete">
