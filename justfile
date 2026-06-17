@@ -1,3 +1,4 @@
+# (this list)
 default:
   just --list
 
@@ -38,11 +39,14 @@ open:
 db:
   sqlite3 -readonly data/wsid.db
 
+# Open a write-enabled sqlite cli
 dbw:
   sqlite3 data/wsid.db
 
+# Open a read-only sqlite cli in Docker
 dbd:
   docker compose exec app sqlite3 -readonly data/wsid.db
 
+# Open a write-enabled sqlite cli in Docker
 dbdw:
   docker compose exec app sqlite3 data/wsid.db
