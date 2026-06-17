@@ -18,9 +18,9 @@
   };
 </script>
 
-<form method="POST" use:enhance={submit}>
+<form class="my-4 flex max-w-96 flex-col gap-4" method="POST" use:enhance={submit}>
   <input type="hidden" name="token" value={token} />
-  <p>Click below to complete your login.</p>
+  <p class="text-body-subtle">Click below to complete your login.</p>
   <Button type="submit" class="bg-cta text-body-inverted hover:bg-cta/90 focus:ring-c01">
     Log in
   </Button>
