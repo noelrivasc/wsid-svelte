@@ -11,6 +11,7 @@
     args: {
       decision: sampleDecision,
       onEditMetadata: fn(),
+      onMakePublic: fn(),
       onAddFactor: fn(),
       onEditFactor: fn(),
       onDeleteFactor: fn(),
