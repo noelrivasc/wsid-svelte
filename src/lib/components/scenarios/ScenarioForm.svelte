@@ -3,7 +3,7 @@
   import { enhance } from '$app/forms';
   import type { SubmitFunction } from '@sveltejs/kit';
   import { Label, Input, Textarea, Button, Helper } from 'flowbite-svelte';
-  import { scenarioSchema, type Scenario } from '$lib/schemas';
+  import { scenarioDraftSchema, type Scenario } from '$lib/schemas';
 
   type Props = {
     action: string;
@@ -33,7 +33,7 @@
     description: description.trim() === '' ? undefined : description.trim()
   });
 
-  const result = $derived(scenarioSchema.safeParse(candidate));
+  const result = $derived(scenarioDraftSchema.safeParse(candidate));
   const isValid = $derived(result.success);
 
   const errors = $derived.by(() => {

@@ -14,12 +14,12 @@ export const actionSchema = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('factor/add'),
     version: v1,
-    payload: factorSchema.extend({ id: z.uuid() })
+    payload: factorSchema
   }),
   z.object({
     type: z.literal('factor/edit'),
     version: v1,
-    payload: factorSchema.extend({ id: z.uuid() })
+    payload: factorSchema
   }),
   z.object({
     type: z.literal('factor/delete'),
@@ -29,12 +29,12 @@ export const actionSchema = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('scenario/add'),
     version: v1,
-    payload: scenarioSchema.extend({ id: z.uuid() })
+    payload: scenarioSchema
   }),
   z.object({
     type: z.literal('scenario/edit'),
     version: v1,
-    payload: scenarioSchema.extend({ id: z.uuid() })
+    payload: scenarioSchema
   }),
   z.object({
     type: z.literal('scenario/delete'),

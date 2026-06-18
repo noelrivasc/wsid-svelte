@@ -3,7 +3,7 @@
   import { enhance } from '$app/forms';
   import type { SubmitFunction } from '@sveltejs/kit';
   import { Label, Input, Textarea, Range, Button, Helper } from 'flowbite-svelte';
-  import { factorSchema, type Factor } from '$lib/schemas';
+  import { factorDraftSchema, type Factor } from '$lib/schemas';
 
   type Props = {
     action: string;
@@ -35,7 +35,7 @@
     weight
   });
 
-  const result = $derived(factorSchema.safeParse(candidate));
+  const result = $derived(factorDraftSchema.safeParse(candidate));
   const isValid = $derived(result.success);
 
   const errors = $derived.by(() => {

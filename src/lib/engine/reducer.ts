@@ -1,5 +1,4 @@
-import type { Decision } from '$lib/schemas';
-import type { Action } from '$lib/schemas';
+import type { Decision, Action } from '$lib/schemas';
 
 // IF the emptyDecision changes, versioning must be implemented
 // to avoid breaking the reducer for existing decisions.
@@ -75,9 +74,4 @@ export function reduce(state: Decision, action: Action): Decision {
 /** Pure fold over an action log. Use when the decision is known to exist. */
 export function replay(actions: Action[]): Decision {
   return actions.reduce(reduce, emptyDecision);
-}
-
-/** Loader-facing wrapper: `null` in (decision missing) → `null` out, else `replay`. */
-export function hydrate(actions: Action[] | null): Decision | null {
-  return actions === null ? null : replay(actions);
 }

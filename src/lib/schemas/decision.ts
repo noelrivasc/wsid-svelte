@@ -4,8 +4,8 @@ import { scenariosListSchema } from './scenario';
 import { decisionMetadataSchema } from './decisionMetadata';
 
 export const scenarioFactorValuesSchema = z.record(
-  z.string(),
-  z.record(z.string(), z.number().nullable())
+  z.string(), // Keys are scenario ids
+  z.record(z.string(), z.number().nullable()) // values are maps of factor ids to their values { factorId: value }
 );
 
 export const decisionSchema = z.object({
