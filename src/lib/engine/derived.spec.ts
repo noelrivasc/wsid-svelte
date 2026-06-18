@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getScoredScenarios } from './scoring';
+import { getScoredScenarios } from './derived';
 import { sampleDecision } from '$lib/test_data/decision';
 import { scenarioIds } from '$lib/test_data/scenarios';
 

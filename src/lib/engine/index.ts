@@ -1,7 +1,7 @@
 export * from './reducer';
 import type { Decision, Action } from '$lib/schemas';
 import { replay } from './reducer';
-import { getScoredScenarios } from './scoring';
+import { getScoredScenarios } from './derived';
 
 /** Loader-facing wrapper: `null` in (decision missing) → `null` out, else `replay`. */
 export function hydrate(actions: Action[] | null): Decision | null {
