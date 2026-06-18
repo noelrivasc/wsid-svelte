@@ -56,7 +56,7 @@
   />
 
   <Label class="max-w-xs space-y-2">
-    <span>View mode</span>
+    <span class="mb-2 inline-block">View mode</span>
     <Select items={viewModeItems} bind:value={viewMode} />
   </Label>
 

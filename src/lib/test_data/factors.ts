@@ -1,4 +1,4 @@
-import type { Factor, Factors } from '$lib/schemas';
+import type { Factor, FactorsList } from '$lib/schemas';
 
 export const factorIds = {
   salary: '8199397c-9ea0-4c25-92fe-c86e44089183',
@@ -42,9 +42,9 @@ export const officeSnacksFactor: Factor = {
   weight: 0
 };
 
-export const coreFactors: Factors = [salaryFactor, commuteFactor, cultureFactor];
+export const coreFactors: FactorsList = [salaryFactor, commuteFactor, cultureFactor];
 
-export const sampleFactors: Factors = [
+export const sampleFactors: FactorsList = [
   salaryFactor,
   commuteFactor,
   cultureFactor,

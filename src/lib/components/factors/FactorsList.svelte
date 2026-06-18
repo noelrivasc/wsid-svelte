@@ -1,10 +1,10 @@
 <script lang="ts">
   import { PlusOutline } from 'flowbite-svelte-icons';
-  import type { Factor, Factors } from '$lib/schemas';
+  import type { Factor, FactorsList } from '$lib/schemas';
   import FactorRow from './FactorRow.svelte';
 
   type Props = {
-    factors: Factors;
+    factors: FactorsList;
     readOnly?: boolean;
     onAdd?: () => void;
     onEdit?: (factor: Factor) => void;

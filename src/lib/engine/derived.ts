@@ -1,4 +1,4 @@
-import type { Decision, Scenario, ScenariosList, Factor } from '$lib/schemas';
+import type { Decision, Scenario, ScenariosList, Factor, FactorsList } from '$lib/schemas';
 
 /**
  * Compute per-scenario scores by multiplying the values
@@ -6,11 +6,7 @@ import type { Decision, Scenario, ScenariosList, Factor } from '$lib/schemas';
  * by the factors' weights.
  **/
 export function getScoredScenarios(decision: Decision): ScenariosList {
-  const factorsMap = decision.factors.reduce((acc, factor: Factor): Record<string, Factor> => {
-    acc[factor.id] = factor;
-    return acc;
-  }, {});
-
+  const factorsMap = getFactorsMap(decision.factors);
   const scoredScenarios = decision.scenarios.map((s: Scenario) => {
     const vals = decision.scenarioFactorValues[s.id];
     let score = 0;
@@ -28,3 +24,9 @@ export function getScoredScenarios(decision: Decision): ScenariosList {
   return scoredScenarios;
 }
 
+export function getFactorsMap(factors: FactorsList): Record<string, Factor> {
+  return factors.reduce((acc, factor: Factor): Record<string, Factor> => {
+    acc[factor.id] = factor;
+    return acc;
+  }, {});
+}

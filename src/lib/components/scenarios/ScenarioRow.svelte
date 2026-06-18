@@ -15,7 +15,12 @@
 
 <li class="grid {gridCols} items-center gap-2 border-b border-c01 py-3 last:border-b-0">
   <div class="min-w-0">
-    <p class="truncate text-base font-semibold text-body">{scenario.title}</p>
+    <p class="truncate text-base font-semibold text-body">
+      {scenario.title}
+      <span class="ml-2 text-xs text-accent-green uppercase">
+        score: {Number.isInteger(scenario.score) ? scenario.score : ''}
+      </span>
+    </p>
     {#if scenario.description}
       <p class="truncate text-sm text-body-subtle">{scenario.description}</p>
     {/if}

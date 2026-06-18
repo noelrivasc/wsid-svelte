@@ -14,4 +14,4 @@ export const factorDraftSchema = factorSchema.partial({
 export const factorsListSchema = z.array(factorSchema);
 
 export type Factor = z.infer<typeof factorSchema>;
-export type Factors = z.infer<typeof factorsListSchema>;
+export type FactorsList = z.infer<typeof factorsListSchema>;

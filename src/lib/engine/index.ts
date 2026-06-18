@@ -9,5 +9,6 @@ export function hydrate(actions: Action[] | null): Decision | null {
   if (actions === null) return null;
 
   const decision: Decision = replay(actions);
-  return { ...decision, scenarios: getScoredScenarios(decision) };
+  const scenarios = getScoredScenarios(decision).sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+  return { ...decision, scenarios };
 }
