@@ -15,7 +15,8 @@ import {
 import { sampleActions, sampleDecisionId, sampleInitialMetadata } from '$lib/test_data/actions';
 import { sampleDecision } from '$lib/test_data/decision';
 import { sampleUser, sampleUserId } from '$lib/test_data/user';
-import { emptyDecision, hydrate } from '../engine/reducer';
+import { emptyDecision } from '../engine/reducer';
+import { hydrate } from '../engine';
 
 const ts = '2026-01-01T00:00:00Z';
 const otherUserId = '00000000-0000-4000-8000-0000000000ff';

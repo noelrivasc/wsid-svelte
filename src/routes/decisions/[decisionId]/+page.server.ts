@@ -7,7 +7,7 @@ import {
   setPublicStatus,
   OwnershipError
 } from '$lib/store/decisionRepository';
-import { hydrate } from '$lib/engine/reducer';
+import { hydrate } from '$lib/engine';
 import { decisionMetadataSchema, factorSchema, scenarioSchema, type Action } from '$lib/schemas';
 import { error, fail } from '@sveltejs/kit';
 import { z } from 'zod';
