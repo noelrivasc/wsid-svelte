@@ -68,6 +68,18 @@ export function reduce(state: Decision, action: Action): Decision {
         }
       };
     }
+
+    case 'scenarioFactorValue/setMultiple': {
+      const { scenarioId, values } = action.payload;
+      const current = state.scenarioFactorValues[scenarioId] ?? {};
+      return {
+        ...state,
+        scenarioFactorValues: {
+          ...state.scenarioFactorValues,
+          [scenarioId]: { ...current, ...values }
+        }
+      };
+    }
   }
 }
 

@@ -1,4 +1,30 @@
-import type { Decision, Scenario, ScenariosList, Factor, FactorsList } from '$lib/schemas';
+import type {
+  Decision,
+  Scenario,
+  ScenariosList,
+  Factor,
+  FactorsList,
+  ScenarioFactorValues
+} from '$lib/schemas';
+
+/**
+ * Score a single scenario from its factor values: the sum of each
+ * value multiplied by the matching factor's weight. Null/missing
+ * values contribute nothing. Shared by the canonical scorer and the
+ * live preview in the values editor so both use one formula.
+ **/
+export function scoreFromValues(
+  values: ScenarioFactorValues[string] | undefined,
+  factorsMap: Record<string, Factor>
+): number {
+  let score = 0;
+  for (const fid in values) {
+    const factor = factorsMap[fid];
+    if (!factor) continue;
+    score += factor.weight * (values[fid] ?? 0);
+  }
+  return score;
+}
 
 /**
  * Compute per-scenario scores by multiplying the values
@@ -8,16 +34,9 @@ import type { Decision, Scenario, ScenariosList, Factor, FactorsList } from '$li
 export function getScoredScenarios(decision: Decision): ScenariosList {
   const factorsMap = getFactorsMap(decision.factors);
   const scoredScenarios = decision.scenarios.map((s: Scenario) => {
-    const vals = decision.scenarioFactorValues[s.id];
-    let score = 0;
-    for (const fid in vals) {
-      const weight = factorsMap[fid].weight;
-      score += weight * (vals[fid] ?? 0);
-    }
-
     // Keep the function pure; avoid mutating the input Decision
     const newScenario = structuredClone(s);
-    newScenario.score = score;
+    newScenario.score = scoreFromValues(decision.scenarioFactorValues[s.id], factorsMap);
     return newScenario;
   });
 

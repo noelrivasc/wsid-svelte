@@ -86,6 +86,7 @@
   <Label class="space-y-2">
     <span>Description <span class="text-body-subtle">(optional)</span></span>
     <Textarea
+      class="w-100"
       name="description"
       bind:value={description}
       onblur={() => (descriptionTouched = true)}

@@ -1,4 +1,5 @@
 export * from './reducer';
+export * from './derived';
 import type { Decision, Action } from '$lib/schemas';
 import { replay } from './reducer';
 import { getScoredScenarios } from './derived';
