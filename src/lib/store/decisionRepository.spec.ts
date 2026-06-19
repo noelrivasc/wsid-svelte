@@ -13,7 +13,7 @@ import {
   OwnershipError
 } from './decisionRepository';
 import { sampleActions, sampleDecisionId, sampleInitialMetadata } from '$lib/test_data/actions';
-import { sampleDecision } from '$lib/test_data/decision';
+import { sampleDecision, sampleHydratedDecision } from '$lib/test_data/decision';
 import { sampleUser, sampleUserId } from '$lib/test_data/user';
 import { emptyDecision } from '../engine/reducer';
 import { hydrate } from '../engine';
@@ -53,7 +53,7 @@ describe('store', () => {
     await seed(db);
     const actions = await loadActions(sampleDecisionId, sampleUserId, db);
     const decision = hydrate(actions);
-    expect(decision).toEqual(sampleDecision);
+    expect(decision).toEqual(sampleHydratedDecision);
   });
 
   it('loadDecisionList reflects current title (last updateMetadata wins)', async () => {
@@ -124,7 +124,7 @@ describe('store', () => {
     expect(await loadActions(sampleDecisionId, otherUserId, db)).toBeNull();
     await setPublicStatus(sampleDecisionId, true, sampleUserId, db);
     const actions = await loadActions(sampleDecisionId, otherUserId, db);
-    expect(hydrate(actions)).toEqual(sampleDecision);
+    expect(hydrate(actions)).toEqual(sampleHydratedDecision);
   });
 
   it('appendAction rejects a non-owner with OwnershipError', async () => {

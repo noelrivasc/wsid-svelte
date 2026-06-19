@@ -1,4 +1,5 @@
 import type { Decision, ScenarioFactorValues } from '$lib/schemas';
+import { getScoredScenarios } from '$lib/engine/derived';
 import { coreFactors, factorIds } from './factors';
 import { sampleScenarios, scenarioIds } from './scenarios';
 import { shortMetadata } from './decisionMetadata';
@@ -26,4 +27,11 @@ export const sampleDecision: Decision = {
   factors: coreFactors,
   scenarios: sampleScenarios,
   scenarioFactorValues: sampleScenarioFactorValues
+};
+
+// The sample decision after `hydrate`: scenarios carry scores and are sorted
+// by score descending. Mirrors the enrichment in `hydrate`.
+export const sampleHydratedDecision: Decision = {
+  ...sampleDecision,
+  scenarios: getScoredScenarios(sampleDecision).sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
 };
