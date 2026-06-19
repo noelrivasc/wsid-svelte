@@ -11,6 +11,8 @@
   import ScenarioFormAdd from '$lib/components/scenarios/ScenarioFormAdd.svelte';
   import ScenarioFormEdit from '$lib/components/scenarios/ScenarioFormEdit.svelte';
   import ScenarioFormDelete from '$lib/components/scenarios/ScenarioFormDelete.svelte';
+  import ScenarioFactorValuesFormEdit from '$lib/components/scenarios/ScenarioFactorValuesFormEdit.svelte';
+  import { getFactorsMap } from '$lib/engine';
   import type { Factor, Scenario } from '$lib/schemas';
 
   let { data }: PageProps = $props();
@@ -24,12 +26,16 @@
   let factorBeingDeleted = $state<Factor | null>(null);
 
   let addScenarioOpen = $state(false);
+  let editScenarioValuesOpen = $state(false);
   let editScenarioOpen = $state(false);
   let deleteScenarioOpen = $state(false);
+  let scenarioBeingValued = $state<Scenario | null>(null);
   let scenarioBeingEdited = $state<Scenario | null>(null);
   let scenarioBeingDeleted = $state<Scenario | null>(null);
 
   const transitionParams = { x: 320, duration: 200, easing: sineIn };
+
+  const factorsMap = $derived(getFactorsMap(data.decision.factors));
 
   function openEditFactor(factor: Factor) {
     factorBeingEdited = factor;
@@ -39,6 +45,11 @@
   function openDeleteFactor(factor: Factor) {
     factorBeingDeleted = factor;
     deleteFactorOpen = true;
+  }
+
+  function openEditScenarioValues(scenario: Scenario) {
+    scenarioBeingValued = scenario;
+    editScenarioValuesOpen = true;
   }
 
   function openEditScenario(scenario: Scenario) {
@@ -61,6 +72,7 @@
   onEditFactor={openEditFactor}
   onDeleteFactor={openDeleteFactor}
   onAddScenario={() => (addScenarioOpen = true)}
+  onEditScenarioValues={openEditScenarioValues}
   onEditScenario={openEditScenario}
   onDeleteScenario={openDeleteScenario}
 />
@@ -141,6 +153,27 @@
     onCancel={() => (addScenarioOpen = false)}
     onSuccess={() => (addScenarioOpen = false)}
   />
+</Drawer>
+
+<Drawer
+  bind:open={editScenarioValuesOpen}
+  placement="right"
+  {transitionParams}
+  class="w-full max-w-md p-6"
+>
+  <h2 class="mb-4 text-xl font-semibold text-heading">
+    Decision factors{scenarioBeingValued ? `: ${scenarioBeingValued.title}` : ''}
+  </h2>
+  {#if scenarioBeingValued}
+    <ScenarioFactorValuesFormEdit
+      scenario={scenarioBeingValued}
+      factors={data.decision.factors}
+      {factorsMap}
+      values={data.decision.scenarioFactorValues[scenarioBeingValued.id]}
+      onCancel={() => (editScenarioValuesOpen = false)}
+      onSuccess={() => (editScenarioValuesOpen = false)}
+    />
+  {/if}
 </Drawer>
 
 <Drawer

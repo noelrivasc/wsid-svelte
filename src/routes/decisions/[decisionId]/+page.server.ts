@@ -8,7 +8,13 @@ import {
   OwnershipError
 } from '$lib/store/decisionRepository';
 import { hydrate } from '$lib/engine';
-import { decisionMetadataSchema, factorSchema, scenarioSchema, type Action } from '$lib/schemas';
+import {
+  decisionMetadataSchema,
+  factorSchema,
+  scenarioSchema,
+  scenarioFactorValueSchema,
+  type Action
+} from '$lib/schemas';
 import { error, fail } from '@sveltejs/kit';
 import { z } from 'zod';
 
@@ -44,7 +50,11 @@ const idSchema = z.uuid();
 const valueSchema = z.object({
   scenarioId: z.uuid(),
   factorId: z.uuid(),
-  value: z.number().nullable()
+  value: scenarioFactorValueSchema
+});
+const valuesSchema = z.object({
+  scenarioId: z.uuid(),
+  values: z.record(z.uuid(), scenarioFactorValueSchema)
 });
 
 export const actions: Actions = {
@@ -172,6 +182,28 @@ export const actions: Actions = {
     if (!parsed.success) return fail(400, { error: parsed.error.message });
     return guardedAppend(locals, params.decisionId, {
       type: 'scenarioFactorValue/set',
+      version: 1,
+      payload: parsed.data
+    });
+  },
+
+  // Batch counterpart to setValue: one event per scenario per save.
+  // Per-factor values arrive as `value:<factorId>` fields ('' means null/unset).
+  setValues: async ({ request, params, locals }) => {
+    const data = await request.formData();
+    const values: Record<string, number | null> = {};
+    for (const [key, raw] of data.entries()) {
+      if (!key.startsWith('value:')) continue;
+      const factorId = key.slice('value:'.length);
+      values[factorId] = raw === '' ? null : Number(raw);
+    }
+    const parsed = valuesSchema.safeParse({
+      scenarioId: data.get('scenarioId'),
+      values
+    });
+    if (!parsed.success) return fail(400, { error: parsed.error.message });
+    return guardedAppend(locals, params.decisionId, {
+      type: 'scenarioFactorValue/setMultiple',
       version: 1,
       payload: parsed.data
     });
