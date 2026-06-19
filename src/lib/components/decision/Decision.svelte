@@ -17,6 +17,7 @@
     onEditFactor?: (factor: Factor) => void;
     onDeleteFactor?: (factor: Factor) => void;
     onAddScenario?: () => void;
+    onEditScenarioValues?: (scenario: Scenario) => void;
     onEditScenario?: (scenario: Scenario) => void;
     onDeleteScenario?: (scenario: Scenario) => void;
   };
@@ -29,6 +30,7 @@
     onEditFactor,
     onDeleteFactor,
     onAddScenario,
+    onEditScenarioValues,
     onEditScenario,
     onDeleteScenario
   }: Props = $props();
@@ -75,6 +77,7 @@
       scenarios={decision.scenarios}
       {readOnly}
       onAdd={onAddScenario}
+      onEditValues={onEditScenarioValues}
       onEdit={onEditScenario}
       onDelete={onDeleteScenario}
     />

@@ -7,10 +7,11 @@
     scenarios: ScenariosList;
     readOnly?: boolean;
     onAdd?: () => void;
+    onEditValues?: (scenario: Scenario) => void;
     onEdit?: (scenario: Scenario) => void;
     onDelete?: (scenario: Scenario) => void;
   };
-  let { scenarios, readOnly = false, onAdd, onEdit, onDelete }: Props = $props();
+  let { scenarios, readOnly = false, onAdd, onEditValues, onEdit, onDelete }: Props = $props();
 </script>
 
 <section>
@@ -39,7 +40,7 @@
   {:else}
     <ul class="mt-4">
       {#each scenarios as scenario (scenario.id ?? scenario.title)}
-        <ScenarioRow {scenario} {readOnly} {onEdit} {onDelete} />
+        <ScenarioRow {scenario} {readOnly} {onEditValues} {onEdit} {onDelete} />
       {/each}
     </ul>
   {/if}
